@@ -1,4 +1,4 @@
-package th.ac.rmutto.finlove
+package th.ac.rmutto.finlove.ui.profile
 
 import androidx.appcompat.widget.Toolbar
 import android.app.DatePickerDialog
@@ -25,6 +25,11 @@ import okhttp3.Request
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
+import th.ac.rmutto.finlove.AddphotoActivity
+import th.ac.rmutto.finlove.ChangePreferenceActivity
+import th.ac.rmutto.finlove.FirstPageActivity
+import th.ac.rmutto.finlove.R
+import th.ac.rmutto.finlove.User
 import java.util.*
 
 class ProfileFragment : Fragment() {
@@ -48,6 +53,7 @@ class ProfileFragment : Fragment() {
     private lateinit var buttonSaveProfile: Button
     private lateinit var buttonChangeImage: Button
     private lateinit var buttonEditPreferences: Button
+    private lateinit var buttonVerify: Button // ปุ่มยืนยันตัวตนที่เพิ่มเข้ามา
     private lateinit var buttonLogout: Button
     private lateinit var buttonDeleteAccount: Button
     private var selectedImageUri: Uri? = null
@@ -102,6 +108,7 @@ class ProfileFragment : Fragment() {
         buttonLogout = root.findViewById(R.id.buttonLogout)
         buttonDeleteAccount = root.findViewById(R.id.buttonDeleteAccount)
         buttonEditPreferences = root.findViewById(R.id.buttonEditPreferences)
+        buttonVerify = root.findViewById(R.id.buttonVerify) // ปุ่มยืนยันตัวตน
 
         setupSpinners()
 
@@ -133,6 +140,11 @@ class ProfileFragment : Fragment() {
             val intent = Intent(requireContext(), ChangePreferenceActivity::class.java)
             intent.putExtra("userID", requireActivity().intent.getIntExtra("userID", -1))
             startActivityForResult(intent, REQUEST_CODE_CHANGE_PREFERENCES)
+        }
+
+        buttonVerify.setOnClickListener {
+            val intent = Intent(requireContext(), AddphotoActivity::class.java) // นำทางไปยัง AddphotoActivity
+            startActivity(intent)
         }
 
         buttonSelectDateProfile.setOnClickListener {
@@ -432,7 +444,6 @@ class ProfileFragment : Fragment() {
         buttonChangeImage.isEnabled = enabled
         buttonSaveProfile.isEnabled = enabled
     }
-
 
     private fun showAllFields() {
         spinnerInterestGender.visibility = View.VISIBLE

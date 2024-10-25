@@ -75,14 +75,10 @@ class ChatAdapter(private val currentUserID: Int) : RecyclerView.Adapter<Recycle
     }
 
     inner class RightChatViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val profileImage: ImageView = itemView.findViewById(R.id.profile_image)
         private val messageText: TextView = itemView.findViewById(R.id.message_text)
 
         fun bind(chatMessage: ChatMessage) {
             messageText.text = chatMessage.message
-            Glide.with(itemView.context)
-                .load(chatMessage.profilePicture)
-                .into(profileImage)
         }
     }
 }
