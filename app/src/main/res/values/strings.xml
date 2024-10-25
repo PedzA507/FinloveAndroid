@@ -1,0 +1,52 @@
+<resources>
+    <string name="app_name">Finlove</string>
+    <string name="title_Main">Main</string>
+    <string name="title_Message">Message</string>
+    <string name="title_Profile">Profile</string>
+    <string name="root_url">http://192.168.36.1:4000</string>
+    <string name="root_url2">http://192.168.36.1:6000</string>
+    <string-array name="education_levels">
+        <item>มัธยมศึกษา</item>
+        <item>ปริญญาตรี</item>
+        <item>ปริญญาโท</item>
+        <item>ปริญญาเอก</item>
+        <item>กำลังทำงาน</item>
+    </string-array>
+
+    <!-- Goal options -->
+    <string-array name="goal_options">
+        <item>หาคู่รักที่จริงใจ</item>
+        <item>หาคู่เดทช่วงสั้นๆ</item>
+        <item>หาเพื่อนใหม่</item>
+        <item>ยังไม่แน่ใจ</item>
+    </string-array>
+
+    <!-- Preference options -->
+    <string-array name="preference_options">
+        <item>ฟุตบอล</item>
+        <item>ภาพยนตร์</item>
+        <item>ท่องเที่ยว</item>
+        <item>อนิเมชั่น</item>
+        <item>ช็อปปิ้ง</item>
+        <item>เล่นดนตรี</item>
+        <item>เล่นกีฬา</item>
+        <item>เล่นเกม</item>
+        <item>อ่านหนังสือ</item>
+        <item>ปาร์ตี้</item>
+        <item>สายควัน</item>
+        <item>ออกกำลังกาย</item>
+    </string-array>
+
+    <string-array name="gender_array">
+        <item>Male</item>
+        <item>Female</item>
+        <item>Other</item>
+    </string-array>
+
+    <string-array name="interest_gender_array">
+        <item>Male</item>
+        <item>Female</item>
+        <item>Other</item>
+    </string-array>
+
+</resources>

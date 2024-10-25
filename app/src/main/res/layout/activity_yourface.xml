@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/yourface"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/background"
+    android:orientation="vertical"
+    tools:context=".yourfaceActivity">
+
+    <android.widget.Button
+        android:id="@+id/buttonback"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginTop="40dp"
+        android:layout_marginLeft="40dp"
+        android:background="@drawable/arrow" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="นี้คือคุณ"
+        android:layout_gravity="center"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        android:textSize="30dp" />
+
+    <RelativeLayout
+        android:id="@+id/clickupload"
+        android:layout_width="280dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@drawable/image_border"
+        android:gravity="center">
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:scaleType="centerCrop"
+        android:adjustViewBounds="true"/>
+
+</RelativeLayout>
+
+
+<android.widget.Button
+        android:id="@+id/buttonage"
+        android:layout_width="288dp"
+        android:layout_height="60dp"
+        android:layout_gravity="center"
+        android:textStyle="bold"
+        android:layout_marginTop="50dp"
+        android:textColor="@color/blue"
+        android:textSize="22dp"
+        android:text="คุณอายุเท่าไหร่?" />
+
+    <android.widget.Button
+        android:id="@+id/buttonstar"
+        android:layout_width="288dp"
+        android:layout_height="60dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="20dp"
+        android:textStyle="bold"
+        android:textSize="18dp"
+        android:text="คุณหน้าเหมือนดาราคนไหน?" />
+
+
+</LinearLayout>
