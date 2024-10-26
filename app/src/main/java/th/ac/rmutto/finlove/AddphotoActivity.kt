@@ -4,59 +4,63 @@ import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.view.View
 import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import okhttp3.*
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.RequestBody.Companion.asRequestBody
+import org.json.JSONObject
 import th.ac.rmutto.finlove.databinding.ActivityAddphotoBinding
+import th.ac.rmutto.finlove.ui.profile.ProfileFragment
 import java.io.File
 import java.io.FileOutputStream
+import java.io.IOException
+import java.util.concurrent.TimeUnit
 
 class AddphotoActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityAddphotoBinding
     private val PICK_IMAGE = 1
     private val CAMERA_REQUEST = 2
+    private val client = OkHttpClient.Builder().connectTimeout(10, TimeUnit.SECONDS).build()
+    private var userID: Int = -1  // รับ userID ที่ส่งมาจาก ProfileFragment
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
 
-        // Inflate the layout using ViewBinding
         binding = ActivityAddphotoBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Apply system window insets to add padding for status and navigation bars
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.addphoto)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
 
-        // Check permissions for camera and external storage
+        // รับ userID จาก Intent
+        userID = intent.getIntExtra("userID", -1)
+
         checkPermissions()
 
-        // Set click listener for the ImageView (to upload image)
         binding.imageView.setOnClickListener {
             showImageChooser()
         }
 
-        // Set click listener for the confirm button
         binding.confirmButton.setOnClickListener {
-            Toast.makeText(this, "Image confirmed!", Toast.LENGTH_SHORT).show()
+            val imageUri = (binding.imageView.tag as? Uri) ?: return@setOnClickListener
+            sendImageForVerification(imageUri)
         }
     }
 
-    // Function to show options for choosing image (camera or gallery)
     private fun showImageChooser() {
         val options = arrayOf<CharSequence>("Take Photo", "Choose from Gallery", "Cancel")
         val builder = android.app.AlertDialog.Builder(this)
@@ -76,10 +80,8 @@ class AddphotoActivity : AppCompatActivity() {
             }
         }
         builder.show()
-
     }
 
-    // Function to check if camera and storage permissions are granted
     private fun checkPermissions() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED ||
             ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
@@ -87,51 +89,32 @@ class AddphotoActivity : AppCompatActivity() {
         }
     }
 
-    fun onNext(selectedImageUri: Uri) {
-        // Make the confirm button visible
+    private fun onNext(selectedImageUri: Uri) {
         binding.confirmButton.visibility = View.VISIBLE
-
-        binding.confirmButton.setOnClickListener {
-            // Create an Intent to start the next activity
-            val intent = Intent(this, yourfaceActivity::class.java)
-            intent.putExtra("imageUri", selectedImageUri.toString())
-            startActivity(intent)
-        }
+        binding.imageView.tag = selectedImageUri
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-
         if (resultCode == RESULT_OK) {
             when (requestCode) {
                 PICK_IMAGE -> {
                     val selectedImage: Uri? = data?.data
                     selectedImage?.let {
-                        // Set the image to ImageView
                         binding.imageView.setImageURI(it)
-                        binding.textViewFile.text = it.lastPathSegment
                         binding.textViewFile.text = "รายละเอียดชื่อไฟล์: " + it.lastPathSegment
                         binding.textViewFile.visibility = View.VISIBLE
-                        // Hide the instruction TextView
                         binding.textView.visibility = View.GONE
                         onNext(it)
                     }
                 }
                 CAMERA_REQUEST -> {
                     val photo: Bitmap = data?.extras?.get("data") as Bitmap
-                    // Set the captured photo to ImageView
                     binding.imageViewshow.setImageBitmap(photo)
-                    // Set a general message as there is no file name
-                    binding.textViewFile.text = "Captured Image"
-
-
                     binding.imageView.visibility = View.GONE
+                    binding.textViewFile.text = "Captured Image"
                     binding.textViewFile.visibility = View.VISIBLE
-                    // Hide the instruction TextView
                     binding.textView.visibility = View.GONE
-
-                    // You can optionally save the captured image to the device and get its Uri
-                    // Here's a simple example using a placeholder Uri
                     val placeholderUri = saveImageToExternalStorage(photo)
                     onNext(placeholderUri)
                 }
@@ -150,11 +133,55 @@ class AddphotoActivity : AppCompatActivity() {
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
         outputStream.flush()
         outputStream.close()
-
-        // Return the Uri of the saved file
         return Uri.fromFile(file)
     }
 
+    private fun sendImageForVerification(imageUri: Uri) {
+        val url = "http://192.168.1.53:5000/verify"
+
+        // แปลง Uri ของไฟล์เป็น File ที่เข้าถึงได้
+        val imagePath = imageUri.path ?: ""
+        val imageFile = File(imagePath)
+
+        if (!imageFile.exists()) {
+            Toast.makeText(this, "File not found at: $imagePath", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val requestBody = MultipartBody.Builder().setType(MultipartBody.FORM)
+            .addFormDataPart("image", imageFile.name, imageFile.asRequestBody("image/*".toMediaTypeOrNull()))
+            .addFormDataPart("userID", userID.toString())  // ส่ง userID ไปยังเซิร์ฟเวอร์
+            .build()
+
+        val request = Request.Builder().url(url).post(requestBody).build()
+
+        client.newCall(request).enqueue(object : Callback {
+            override fun onResponse(call: Call, response: Response) {
+                if (response.isSuccessful) {
+                    val isVerified = JSONObject(response.body?.string()).getBoolean("is_verified")
+                    runOnUiThread {
+                        Toast.makeText(
+                            this@AddphotoActivity,
+                            if (isVerified) "Verify สำเร็จ" else "Verify ไม่สำเร็จ",
+                            Toast.LENGTH_SHORT
+                        ).show()
+
+                        // แทนที่ด้วยการกลับไปที่ ProfileFragment
+                        val intent = Intent(this@AddphotoActivity, MainActivity::class.java)
+                        intent.putExtra("userID", userID)
+                        intent.putExtra("navigateToProfile", true)  // ส่งข้อมูลไปให้เปิด ProfileFragment
+                        startActivity(intent)
+                        finish() // ปิด Activity นี้หลังจากเริ่ม Intent ใหม่
+                    }
+                }
+            }
 
 
+            override fun onFailure(call: Call, e: IOException) {
+                runOnUiThread {
+                    Toast.makeText(this@AddphotoActivity, "Failed to verify image", Toast.LENGTH_SHORT).show()
+                }
+            }
+        })
+    }
 }

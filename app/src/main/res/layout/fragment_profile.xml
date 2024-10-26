@@ -72,6 +72,19 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
+            <!-- Verify Badge -->
+            <ImageView
+                android:id="@+id/verifyBadge"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_marginTop="12dp"
+                android:layout_marginEnd="12dp"
+                android:src="@drawable/verify"
+                app:layout_constraintEnd_toEndOf="@+id/imageViewProfile"
+                app:layout_constraintTop_toTopOf="@+id/imageViewProfile"
+                android:visibility="visible"
+                android:contentDescription="Verified Badge" />
+
             <!-- Verification Button -->
             <Button
                 android:id="@+id/buttonVerify"
@@ -213,7 +226,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 android:layout_marginStart="16dp"
                 android:layout_marginEnd="16dp"
-                android:gravity="center" /> <!-- เพิ่ม gravity center เพื่อให้อยู่ตรงกลาง -->
+                android:gravity="center" />
 
             <!-- ปุ่มแก้ไขความชอบ -->
             <Button

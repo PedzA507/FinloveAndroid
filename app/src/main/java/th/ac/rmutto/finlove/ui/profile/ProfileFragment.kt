@@ -48,6 +48,7 @@ class ProfileFragment : Fragment() {
     private lateinit var spinnerEducation: Spinner
     private lateinit var spinnerGoal: Spinner
     private lateinit var preferenceContainer: LinearLayout
+    private lateinit var verifyBadge: ImageView
 
     private lateinit var buttonEditProfile: ImageButton
     private lateinit var buttonSaveProfile: Button
@@ -109,6 +110,7 @@ class ProfileFragment : Fragment() {
         buttonDeleteAccount = root.findViewById(R.id.buttonDeleteAccount)
         buttonEditPreferences = root.findViewById(R.id.buttonEditPreferences)
         buttonVerify = root.findViewById(R.id.buttonVerify) // ปุ่มยืนยันตัวตน
+        verifyBadge = root.findViewById(R.id.verifyBadge)
 
         setupSpinners()
 
@@ -143,7 +145,8 @@ class ProfileFragment : Fragment() {
         }
 
         buttonVerify.setOnClickListener {
-            val intent = Intent(requireContext(), AddphotoActivity::class.java) // นำทางไปยัง AddphotoActivity
+            val intent = Intent(requireContext(), AddphotoActivity::class.java)
+            intent.putExtra("userID", requireActivity().intent.getIntExtra("userID", -1))  // ส่ง userID ไปยัง AddphotoActivity
             startActivity(intent)
         }
 
@@ -258,6 +261,12 @@ class ProfileFragment : Fragment() {
                     withContext(Dispatchers.Main) {
                         originalUser = user
                         updateUserFields(user)
+
+                        // Log ค่า verify เพื่อตรวจสอบ
+                        Log.d("ProfileFragment", "User verify status: ${user.verify}")
+
+                        // แสดงหรือซ่อน verifyBadge ตามค่า verify
+                        verifyBadge.visibility = if (user.verify == 1) View.VISIBLE else View.GONE
                     }
                 } else {
                     withContext(Dispatchers.Main) {
@@ -553,7 +562,10 @@ class ProfileFragment : Fragment() {
             height = jsonObject.optDouble("height", 0.0),
             home = jsonObject.optString("home", ""),
             dateBirth = jsonObject.optString("DateBirth", ""),
-            imageFile = jsonObject.optString("imageFile", "")
+            imageFile = jsonObject.optString("imageFile", ""),
+            verify = jsonObject.optInt("verify", 0) // อ่านค่า verify
         )
     }
+
+
 }

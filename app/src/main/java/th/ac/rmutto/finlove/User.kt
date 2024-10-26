@@ -15,6 +15,7 @@ data class User(
     val education: String,
     val goal: String,
     val imageFile: String,
-    val preferences: String?
+    val preferences: String?,
+    val verify: Int
 )
 

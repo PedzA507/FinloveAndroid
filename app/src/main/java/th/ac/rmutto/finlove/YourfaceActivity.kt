@@ -11,7 +11,6 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.airbnb.lottie.L
 
 class yourfaceActivity : AppCompatActivity() {
     @SuppressLint("MissingInflatedId")
@@ -24,16 +23,20 @@ class yourfaceActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+
         val imageUriString = intent.getStringExtra("imageUri")
         val imageUri = Uri.parse(imageUriString)
         val imageView = findViewById<ImageView>(R.id.imageView)
         val back = findViewById<Button>(R.id.buttonback)
         val buttonage = findViewById<Button>(R.id.buttonage)
         val buttonstar = findViewById<Button>(R.id.buttonstar)
+
         back.setOnClickListener {
             finish()
         }
+
         imageView.setImageURI(imageUri)
+
         buttonage.setOnClickListener {
             if (imageUriString != null) {
                 val intent = Intent(this, LoginActivity::class.java)
@@ -46,7 +49,7 @@ class yourfaceActivity : AppCompatActivity() {
 
         buttonstar.setOnClickListener {
             if (imageUriString != null) {
-                val intent = Intent(this, L::class.java)
+                val intent = Intent(this, LoginActivity::class.java)  // เปลี่ยนจาก L::class.java
                 intent.putExtra("imageUri", imageUriString)
                 startActivity(intent)
             } else {
