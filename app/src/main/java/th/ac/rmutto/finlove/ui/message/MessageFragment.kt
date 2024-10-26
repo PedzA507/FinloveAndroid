@@ -109,13 +109,16 @@ class MessageFragment : Fragment() {
                 val intent = Intent(requireContext(), ChatActivity::class.java).apply {
                     putExtra("matchID", user.matchID)
                     putExtra("senderID", userID)
+                    putExtra("nickname", user.nickname) // ส่ง nickname ของคู่สนทนาไปด้วย
                 }
                 startActivity(intent)
             }
 
+
             profileImage.setOnClickListener {
                 val intent = Intent(requireContext(), OtherProfileActivity::class.java).apply {
                     putExtra("userID", user.userID)
+                    putExtra("nickname", user.nickname)
                 }
                 startActivity(intent)
             }

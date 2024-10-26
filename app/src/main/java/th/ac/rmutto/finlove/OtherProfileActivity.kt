@@ -98,6 +98,10 @@ class OtherProfileActivity : AppCompatActivity() {
 
                         // Update preferences
                         updateUserPreferences(preferences)
+
+                        // Set nickname to the toolbar dynamically
+                        val toolbarTitle = findViewById<TextView>(R.id.toolbarTitle)
+                        toolbarTitle.text = nickname // ตั้งค่าชื่อเล่นที่ได้จาก API ให้กับ Toolbar
                     }
                 } else {
                     withContext(Dispatchers.Main) {
@@ -112,6 +116,7 @@ class OtherProfileActivity : AppCompatActivity() {
             }
         }
     }
+
 
     // Show the report dialog
     private fun showReportDialog(reportedID: Int) {

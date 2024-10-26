@@ -291,9 +291,10 @@ class ProfileFragment : Fragment() {
         textViewHome.setText(user.home)
         buttonSelectDateProfile.text = user.dateBirth
 
-        // Set user's nickname in the toolbar
+        // Set user's nickname in the toolbar dynamically
         val toolbar = requireActivity().findViewById<Toolbar>(R.id.toolbarProfile)
-        toolbar.title = user.nickname // Set real nickname in toolbar
+        val toolbarTitle = toolbar.findViewById<TextView>(R.id.toolbarTitle)
+        toolbarTitle.text = user.nickname // ใช้ nickname จาก user แทนการกำหนดค่าตรง ๆ
 
         preferenceContainer.removeAllViews()
         val preferencesArray = user.preferences?.split(",") ?: listOf()
@@ -303,17 +304,14 @@ class ProfileFragment : Fragment() {
             preferenceTextView.setBackgroundResource(R.drawable.show_preference)
             preferenceTextView.setPadding(16, 16, 16, 16)
 
-            // เพิ่มขนาดตัวอักษร
             preferenceTextView.textSize = 18f
-            //สีขาว
             preferenceTextView.setTextColor(resources.getColor(R.color.white))
 
-            // เพิ่มระยะห่างระหว่างบล็อก
             val layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
             )
-            layoutParams.setMargins(16, 16, 16, 16) // กำหนดระยะห่างระหว่างบล็อก
+            layoutParams.setMargins(16, 16, 16, 16)
 
             preferenceTextView.layoutParams = layoutParams
             preferenceContainer.addView(preferenceTextView)
@@ -341,6 +339,7 @@ class ProfileFragment : Fragment() {
 
         user.imageFile?.let { loadImage(it, imageViewProfile) }
     }
+
 
     private fun saveUserInfo(userID: Int) {
         CoroutineScope(Dispatchers.IO).launch {

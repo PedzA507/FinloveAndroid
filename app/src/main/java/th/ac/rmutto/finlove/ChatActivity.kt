@@ -1,6 +1,5 @@
 package th.ac.rmutto.finlove
 
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -8,6 +7,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.bumptech.glide.Glide
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -41,42 +41,38 @@ class ChatActivity : AppCompatActivity() {
         if (matchID == -1 || senderID == -1) {
             Log.e("ChatActivity", "matchID หรือ senderID ไม่ถูกต้อง")
             Toast.makeText(this, "ไม่พบข้อมูลการสนทนา", Toast.LENGTH_LONG).show()
+            finish()
             return
         }
 
         // ตั้งค่า Toolbar ให้แสดงชื่อเล่นของคู่สนทนา
         setSupportActionBar(binding.toolbar)
-        supportActionBar?.title = receiverNickname
-        supportActionBar?.setDisplayHomeAsUpEnabled(true) // เพิ่มปุ่มย้อนกลับ
+        supportActionBar?.apply {
+            title = receiverNickname // ตั้งค่า title ของ Toolbar เป็น nickname ของคู่สนทนา
+            setDisplayHomeAsUpEnabled(true)
+        }
 
         // กำหนดการทำงานของปุ่มย้อนกลับ
         binding.toolbar.setNavigationOnClickListener {
-            finish() // ย้อนกลับไปหน้าก่อนหน้า
+            finish()
         }
 
         // ตั้งค่า RecyclerView
-        val chatAdapter = ChatAdapter(senderID) // ใช้ senderID ของผู้ใช้ที่ล็อกอินเป็น currentUserID
+        val chatAdapter = ChatAdapter(senderID)
         binding.recyclerViewChat.layoutManager = LinearLayoutManager(this)
         binding.recyclerViewChat.adapter = chatAdapter
 
-        Log.d("ChatActivity", "RecyclerView Adapter attached")
-
-        // ดึงข้อมูลการสนทนา
         fetchChatMessages()
 
         // เมื่อผู้ใช้ส่งข้อความ
         binding.sendButton.setOnClickListener {
             val message = binding.messageInput.text.toString().trim()
-            Log.d("ChatActivity", "User attempting to send message: $message")
             if (message.isNotEmpty()) {
                 sendMessage(message)
                 binding.messageInput.text.clear()
-            } else {
-                Log.d("ChatActivity", "Message is empty, skipping send")
             }
         }
     }
-
 
     private fun fetchChatMessages() {
         lifecycleScope.launch(Dispatchers.IO) {
