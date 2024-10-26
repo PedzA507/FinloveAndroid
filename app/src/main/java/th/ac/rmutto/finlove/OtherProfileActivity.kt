@@ -3,6 +3,7 @@ package th.ac.rmutto.finlove
 import android.app.AlertDialog
 import android.os.Bundle
 import android.util.Log
+import android.view.Gravity
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
@@ -178,9 +179,20 @@ class OtherProfileActivity : AppCompatActivity() {
         for (preference in preferencesArray) {
             val preferenceTextView = TextView(this)
             preferenceTextView.text = preference
-            preferenceTextView.setBackgroundResource(R.drawable.rounded_preference_box)
-            preferenceTextView.setPadding(16, 16, 16, 16)
+            preferenceTextView.setBackgroundResource(R.drawable.show_preference)
+            preferenceTextView.setPadding(16, 16, 16, 16)  // ตามดีไซน์ที่จำไว้
+            preferenceTextView.textSize = 14f
+            preferenceTextView.setTypeface(null, android.graphics.Typeface.BOLD) // ทำตัวหนังสือหนา
+            preferenceTextView.gravity = Gravity.CENTER // จัดให้ตัวหนังสืออยู่ตรงกลาง
+            preferenceTextView.setTextColor(resources.getColor(R.color.white))
+
+            // กำหนด layoutParams ตามดีไซน์ที่จำไว้
+            val layoutParams = LinearLayout.LayoutParams(250, 150)
+            layoutParams.setMargins(16, 16, 16, 16) // เพิ่มมาร์จินตามดีไซน์
+            preferenceTextView.layoutParams = layoutParams
+
             preferencesContainer.addView(preferenceTextView)
         }
     }
+
 }

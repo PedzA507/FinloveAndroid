@@ -61,58 +61,74 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <!-- Image View Profile -->
-            <ImageView
-                android:id="@+id/profile_image"
-                android:layout_width="262dp"
-                android:layout_height="287dp"
-                android:layout_marginTop="16dp"
-                android:contentDescription="Profile Image"
-                android:src="@drawable/img_1"
+            <!-- Profile Card Background -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/constraintLayout"
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:background="@drawable/profile_card"
+                android:padding="16dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent">
+                <!-- Image View Profile -->
+                <ImageView
+                    android:id="@+id/profile_image"
+                    android:layout_width="180dp"
+                    android:layout_height="180dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="16dp"
+                    android:contentDescription="Profile Image"
+                    android:src="@drawable/img_1"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-            <!-- Verified Icon -->
-            <ImageView
-                android:id="@+id/verifiedIcon"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_marginTop="4dp"
-                android:layout_marginEnd="4dp"
-                android:src="@drawable/verify"
-                android:visibility="visible"
-                app:layout_constraintTop_toTopOf="@id/profile_image"
-                app:layout_constraintEnd_toEndOf="@id/profile_image"
-                android:contentDescription="Verified Icon" />
+                <!-- Verify Badge -->
+                <ImageView
+                    android:id="@+id/verifiedIcon"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:layout_marginEnd="5dp"
+                    android:contentDescription="Verified Badge"
+                    android:src="@drawable/verify"
+                    android:visibility="visible"
+                    app:layout_constraintEnd_toEndOf="@+id/imageViewProfile"
+                    app:layout_constraintTop_toTopOf="@+id/imageViewProfile" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
             <!-- Report Button -->
             <Button
                 android:id="@+id/buttonReportUser"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="35dp"
                 android:layout_marginStart="8dp"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="55dp"
+                android:background="@drawable/bt_report"
                 android:text="รายงานผู้ใช้"
-                android:background="@drawable/button_pressed"
-                android:textColor="@color/white"
+                android:textColor="@color/black"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/profile_image"
-                app:layout_constraintTop_toTopOf="@id/profile_image"
-                app:layout_constraintEnd_toEndOf="parent"/>
+                app:layout_constraintTop_toBottomOf="@+id/constraintLayout" />
 
             <!-- First Name -->
             <TextView
                 android:id="@+id/textViewFirstName"
                 android:layout_width="300dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="80dp"
                 android:padding="12dp"
                 android:text="ชื่อจริง: "
                 android:textColor="#000000"
                 android:textSize="18sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/profile_image" />
+                app:layout_constraintTop_toBottomOf="@+id/constraintLayout" />
 
             <!-- Last Name -->
             <TextView
