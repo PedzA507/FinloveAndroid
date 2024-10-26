@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -7,243 +8,226 @@
     android:layout_height="match_parent"
     tools:context=".RegisterActivity5">
 
-    <!-- GridLayout สำหรับจัดเรียงปุ่ม -->
+    <!-- Title TextView -->
     <TextView
         android:id="@+id/textViewTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="170dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="150dp"
+        android:layout_marginEnd="16dp"
         android:text="คุณชอบอะไร"
         android:textAlignment="center"
         android:textColor="@color/blue_main"
-        android:textSize="45sp"
+        android:textSize="52sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.263"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <!-- GridLayout -->
     <GridLayout
         android:id="@+id/gridLayout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:layout_margin="5dp"
+        android:layout_width="400dp"
+        android:layout_height="300dp"
+        android:layout_margin="8dp"
+        android:layout_marginTop="50dp"
         android:alignmentMode="alignMargins"
         android:columnCount="4"
-        android:rowCount="4"
-        android:paddingTop="30dp"
-        android:layout_gravity="center"
-        app:layout_constraintTop_toBottomOf="@id/textViewTitle"
+        android:padding="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintTop_toBottomOf="@id/textViewTitle">
 
         <!-- ปุ่มต่าง ๆ -->
         <Button
             android:id="@+id/buttonOption1"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="ฟุตบอล"
-            android:layout_margin="5dp"
-            android:layout_marginTop="15dp"
-            android:paddingTop="20dp"
-            android:paddingBottom="20dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_margin="4dp"
             android:background="@drawable/button_selector"
+            android:text="ฟุตบอล"
             android:textColor="@drawable/text_selector" />
 
         <Button
             android:id="@+id/buttonOption2"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="ภาพยนตร์"
-            android:layout_margin="5dp"
-            android:layout_marginTop="15dp"
-            android:paddingTop="20dp"
-            android:paddingBottom="20dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_margin="4dp"
             android:background="@drawable/button_selector"
+            android:text="ภาพยนตร์"
             android:textColor="@drawable/text_selector" />
 
         <Button
             android:id="@+id/buttonOption3"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="ท่องเที่ยว"
-            android:layout_margin="5dp"
-            android:layout_marginTop="15dp"
-            android:paddingTop="20dp"
-            android:paddingBottom="20dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_margin="4dp"
             android:background="@drawable/button_selector"
+            android:text="ท่องเที่ยว"
             android:textColor="@drawable/text_selector" />
 
         <Button
             android:id="@+id/buttonOption4"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="อนิเมชั่น"
-            android:layout_margin="5dp"
-            android:layout_marginTop="15dp"
-            android:paddingTop="20dp"
-            android:paddingBottom="20dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_margin="4dp"
             android:background="@drawable/button_selector"
+            android:text="อนิเมชั่น"
             android:textColor="@drawable/text_selector" />
 
         <Button
             android:id="@+id/buttonOption5"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_margin="5dp"
-            android:text="ช็อปปิ้ง"
-            android:layout_marginTop="15dp"
-            android:paddingTop="20dp"
-            android:paddingBottom="20dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_margin="4dp"
             android:background="@drawable/button_selector"
+            android:text="ช็อปปิ้ง"
             android:textColor="@drawable/text_selector" />
 
         <Button
             android:id="@+id/buttonOption6"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="เล่นดนตรี"
-            android:layout_margin="5dp"
-            android:layout_marginTop="15dp"
-            android:paddingTop="20dp"
-            android:paddingBottom="20dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_margin="4dp"
             android:background="@drawable/button_selector"
+            android:text="เล่นดนตรี"
             android:textColor="@drawable/text_selector" />
 
         <Button
             android:id="@+id/buttonOption7"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="เล่นกีฬา"
-            android:layout_margin="5dp"
-            android:layout_marginTop="15dp"
-            android:paddingTop="20dp"
-            android:paddingBottom="20dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_margin="4dp"
             android:background="@drawable/button_selector"
+            android:text="เล่นกีฬา"
             android:textColor="@drawable/text_selector" />
 
         <Button
             android:id="@+id/buttonOption8"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="เล่นเกม"
-            android:layout_margin="5dp"
-            android:layout_marginTop="15dp"
-            android:paddingTop="20dp"
-            android:paddingBottom="20dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_margin="4dp"
             android:background="@drawable/button_selector"
+            android:text="เล่นเกม"
             android:textColor="@drawable/text_selector" />
 
         <Button
             android:id="@+id/buttonOption9"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="อ่านหนังสือ"
-            android:layout_margin="5dp"
-            android:layout_marginTop="15dp"
-            android:paddingTop="20dp"
-            android:paddingBottom="20dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_margin="4dp"
             android:background="@drawable/button_selector"
+            android:text="อ่านหนังสือ"
             android:textColor="@drawable/text_selector" />
 
         <Button
             android:id="@+id/buttonOption10"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="ปาร์ตี้"
-            android:layout_margin="5dp"
-            android:layout_marginTop="15dp"
-            android:paddingTop="20dp"
-            android:paddingBottom="20dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_margin="4dp"
             android:background="@drawable/button_selector"
+            android:text="ปาร์ตี้"
             android:textColor="@drawable/text_selector" />
 
         <Button
             android:id="@+id/buttonOption11"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="สายควัน"
-            android:layout_margin="5dp"
-            android:layout_marginTop="15dp"
-            android:paddingTop="20dp"
-            android:paddingBottom="20dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_margin="4dp"
             android:background="@drawable/button_selector"
+            android:text="สายควัน"
             android:textColor="@drawable/text_selector" />
 
         <Button
             android:id="@+id/buttonOption12"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="ออกกำลังกาย"
-            android:layout_margin="5dp"
-            android:layout_marginTop="15dp"
-            android:paddingTop="20dp"
-            android:paddingBottom="20dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_margin="4dp"
             android:background="@drawable/button_selector"
+            android:text="ออกกำลังกาย"
             android:textColor="@drawable/text_selector" />
 
         <Button
             android:id="@+id/buttonOption13"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="ตกปลา"
-            android:layout_margin="5dp"
-            android:layout_marginTop="15dp"
-            android:paddingTop="20dp"
-            android:paddingBottom="20dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_margin="4dp"
             android:background="@drawable/button_selector"
+            android:text="ตกปลา"
             android:textColor="@drawable/text_selector" />
 
         <Button
             android:id="@+id/buttonOption14"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="รักสัตว์"
-            android:layout_margin="5dp"
-            android:layout_marginTop="15dp"
-            android:paddingTop="20dp"
-            android:paddingBottom="20dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_margin="4dp"
             android:background="@drawable/button_selector"
+            android:text="รักสัตว์"
             android:textColor="@drawable/text_selector" />
 
         <Button
             android:id="@+id/buttonOption15"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="ของหวาน"
-            android:layout_margin="5dp"
-            android:layout_marginTop="15dp"
-            android:paddingTop="20dp"
-            android:paddingBottom="20dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_margin="4dp"
             android:background="@drawable/button_selector"
+            android:text="ของหวาน"
             android:textColor="@drawable/text_selector" />
 
         <Button
             android:id="@+id/buttonOption16"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="ถ่ายรูป"
-            android:layout_marginTop="15dp"
-            android:layout_margin="5dp"
-            android:paddingTop="20dp"
-            android:paddingBottom="20dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_margin="4dp"
             android:background="@drawable/button_selector"
+            android:text="ถ่ายรูป"
             android:textColor="@drawable/text_selector" />
 
     </GridLayout>
 
+    <!-- Next Button -->
     <ImageButton
         android:id="@+id/buttonNextStep5"
-        android:layout_width="93dp"
-        android:layout_height="93dp"
-        android:layout_marginTop="50dp"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_marginTop="25dp"
         android:background="@drawable/cyclebutton"
         android:src="@drawable/ic_arrow_right"
-        android:scaleX="0.8"
-        android:scaleY="0.8"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.886"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/gridLayout" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
