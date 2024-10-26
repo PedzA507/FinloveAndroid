@@ -36,15 +36,15 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Nickname"
-            android:textColor="@android:color/white"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            app:layout_constraintStart_toEndOf="@id/logoImage"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            android:gravity="center"/>
+                android:textColor="@android:color/white"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toEndOf="@id/logoImage"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                android:gravity="center"/>
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.appcompat.widget.Toolbar>
 
@@ -72,6 +72,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
+
                 <!-- Image View Profile -->
                 <ImageView
                     android:id="@+id/profile_image"
@@ -91,12 +92,13 @@
                     android:id="@+id/verifiedIcon"
                     android:layout_width="25dp"
                     android:layout_height="25dp"
+                    android:layout_marginTop="4dp"
                     android:layout_marginEnd="5dp"
                     android:contentDescription="Verified Badge"
                     android:src="@drawable/verify"
                     android:visibility="visible"
-                    app:layout_constraintEnd_toEndOf="@+id/imageViewProfile"
-                    app:layout_constraintTop_toTopOf="@+id/imageViewProfile" />
+                    app:layout_constraintEnd_toEndOf="@+id/profile_image"
+                    app:layout_constraintTop_toTopOf="@+id/profile_image" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
