@@ -10,7 +10,7 @@
         android:id="@+id/message_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/message_right_bubble"
+        android:background="@color/blue_main"
         android:padding="12dp"
         android:textColor="#FFFFFF"
         android:textSize="16sp"
