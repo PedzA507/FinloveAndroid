@@ -5,7 +5,7 @@
     android:id="@+id/yourface"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/background"
+    android:background="@drawable/newbg"
     android:orientation="vertical"
     tools:context=".yourfaceActivity">
 
@@ -32,13 +32,14 @@
         android:layout_width="280dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:background="@drawable/image_border"
+        android:background="@drawable/edittext"
         android:gravity="center">
 
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="300dp"
         android:layout_height="300dp"
+        android:background="@drawable/ic_user"
         android:scaleType="centerCrop"
         android:adjustViewBounds="true"/>
 
@@ -50,9 +51,10 @@
         android:layout_width="288dp"
         android:layout_height="60dp"
         android:layout_gravity="center"
+        android:background="@drawable/button"
         android:textStyle="bold"
         android:layout_marginTop="50dp"
-        android:textColor="@color/blue"
+        android:textColor="@color/white"
         android:textSize="22dp"
         android:text="คุณอายุเท่าไหร่?" />
 
@@ -63,6 +65,8 @@
         android:layout_gravity="center"
         android:layout_marginTop="20dp"
         android:textStyle="bold"
+        android:textColor="@color/white"
+        android:background="@drawable/button"
         android:textSize="18dp"
         android:text="คุณหน้าเหมือนดาราคนไหน?" />
 

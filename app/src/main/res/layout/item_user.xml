@@ -65,7 +65,7 @@
         android:id="@+id/buttonGroup"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="36dp"
+        android:layout_marginBottom="37dp"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
