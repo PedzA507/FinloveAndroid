@@ -1,58 +1,93 @@
-<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
+    android:orientation="vertical"
     android:padding="16dp"
     android:background="@drawable/rounded_square_shape">
 
-    <!-- ImageView สำหรับรูปโปรไฟล์ -->
-    <ImageView
-        android:id="@+id/imageProfile"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:layout_marginEnd="16dp"
-        android:layout_gravity="center_vertical"
-        android:background="@drawable/rounded_square_shape"
-    android:padding="2dp"
-    android:scaleType="centerCrop"
-    android:src="@drawable/ic_user" />
-
-    <!-- TextView สำหรับแสดงชื่อผู้ใช้ -->
     <LinearLayout
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:orientation="vertical">
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
 
-        <TextView
-            android:id="@+id/textNickname"
+        <ImageView
+            android:id="@+id/imageProfile"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_marginEnd="16dp"
+            android:background="@drawable/rounded_square_shape"
+            android:padding="2dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_user" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/textNickname"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Nickname"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@android:color/black" />
+
+            <TextView
+                android:id="@+id/lastMessage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="Last message preview"
+                android:textSize="14sp"
+                android:textColor="@android:color/darker_gray" />
+
+            <TextView
+                android:id="@+id/textLastInteraction"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="12:34"
+                android:textSize="12sp"
+                android:textColor="@android:color/darker_gray" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="end"
+        android:paddingTop="8dp">
+
+        <Button
+            android:id="@+id/buttonBlockChat"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Nickname"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:textColor="@android:color/black" />
+            android:text="บล็อคแชท"
+            android:textColor="@android:color/white"
+            android:background="@color/teal_700"
+            android:layout_marginEnd="8dp" />
 
-        <TextView
-            android:id="@+id/textLastInteraction"
+        <Button
+            android:id="@+id/buttonUnblockChat"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="12:34"
-            android:textSize="12sp"
-            android:textColor="@android:color/darker_gray" />
+            android:text="ปลดบล็อคแชท"
+            android:textColor="@android:color/white"
+            android:background="@color/teal_700"
+            android:layout_marginEnd="8dp" />
 
-
-        <TextView
-            android:id="@+id/lastMessage"
+        <Button
+            android:id="@+id/buttonDeleteChat"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:text="Last message preview"
-            android:textSize="14sp"
-            android:textColor="@android:color/darker_gray" />
-
+            android:text="ลบแชท"
+            android:textColor="@android:color/white"
+            android:background="@color/teal_700" />
     </LinearLayout>
 </LinearLayout>

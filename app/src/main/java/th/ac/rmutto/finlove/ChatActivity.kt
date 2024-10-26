@@ -119,8 +119,6 @@ class ChatActivity : AppCompatActivity() {
     private fun sendMessage(message: String) {
         lifecycleScope.launch(Dispatchers.IO) {
             val url = getString(R.string.root_url) + "/api/chats/$matchID"
-            Log.d("ChatActivity", "Sending message to URL: $url")
-
             val requestBody = FormBody.Builder()
                 .add("senderID", senderID.toString())
                 .add("message", message)
@@ -135,21 +133,26 @@ class ChatActivity : AppCompatActivity() {
                 val response = client.newCall(request).execute()
                 if (!response.isSuccessful) {
                     withContext(Dispatchers.Main) {
-                        Log.e("ChatActivity", "Failed to send message: ${response.message}")
-                        Toast.makeText(this@ChatActivity, "ไม่สามารถส่งข้อความได้", Toast.LENGTH_SHORT).show()
+                        val responseBody = response.body?.string()
+                        if (response.code == 403) {
+                            // หากถูกบล็อกไม่สามารถส่งข้อความได้
+                            Toast.makeText(this@ChatActivity, "คุณถูกบล็อกจากการส่งข้อความในแชทนี้", Toast.LENGTH_SHORT).show()
+                        } else {
+                            Toast.makeText(this@ChatActivity, "ไม่สามารถส่งข้อความได้", Toast.LENGTH_SHORT).show()
+                        }
                     }
                 } else {
-                    Log.d("ChatActivity", "Message sent successfully")
                     fetchChatMessages() // ดึงข้อมูลการสนทนาใหม่
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
-                    Log.e("ChatActivity", "Error occurred while sending message: ${e.message}")
-                    Toast.makeText(this@ChatActivity, "Error: ${e.message}", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this@ChatActivity, "เกิดข้อผิดพลาด: ${e.message}", Toast.LENGTH_LONG).show()
                 }
             }
         }
     }
+
+
 
     private fun parseChatMessages(responseBody: String?): List<ChatMessage> {
         val messages = mutableListOf<ChatMessage>()

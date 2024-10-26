@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -17,6 +18,7 @@ import com.bumptech.glide.Glide
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import okhttp3.FormBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.json.JSONArray
@@ -24,6 +26,7 @@ import th.ac.rmutto.finlove.ChatActivity
 import th.ac.rmutto.finlove.OtherProfileActivity
 import th.ac.rmutto.finlove.R
 import th.ac.rmutto.finlove.databinding.FragmentMessageBinding
+import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -33,9 +36,7 @@ class MessageFragment : Fragment() {
     private val binding get() = _binding!!
     private var userID: Int = -1
     private val client = OkHttpClient()
-
     private var matchedUsers = listOf<MatchedUser>()
-
     private val handler = Handler()
     private val refreshInterval = 2000L // รีเฟรชทุก 2 วินาที
 
@@ -61,7 +62,6 @@ class MessageFragment : Fragment() {
         // รับ userID ที่ถูกส่งมาจาก MainActivity
         userID = arguments?.getInt("userID", -1) ?: -1
 
-        // ตรวจสอบว่า userID ถูกส่งมาหรือไม่
         if (userID != -1) {
             fetchMatchedUsers { fetchedUsers ->
                 if (fetchedUsers.isNotEmpty()) {
@@ -99,35 +99,139 @@ class MessageFragment : Fragment() {
             val profileImage: ImageView = userView.findViewById(R.id.imageProfile)
             val lastMessage: TextView = userView.findViewById(R.id.lastMessage)
             val lastInteraction: TextView = userView.findViewById(R.id.textLastInteraction)
+            val buttonBlockChat: Button = userView.findViewById(R.id.buttonBlockChat)
+            val buttonUnblockChat: Button = userView.findViewById(R.id.buttonUnblockChat)
+            val buttonDeleteChat: Button = userView.findViewById(R.id.buttonDeleteChat)
 
             nickname.text = user.nickname
             lastMessage.text = user.lastMessage ?: "ไม่มีข้อความล่าสุด"
-            lastInteraction.text = formatTime(user.lastInteraction) // แสดง timestamp ที่แปลงเป็น HH:mm
+            lastInteraction.text = formatTime(user.lastInteraction)
             Glide.with(requireContext()).load(user.profilePicture).into(profileImage)
 
             userView.setOnClickListener {
                 val intent = Intent(requireContext(), ChatActivity::class.java).apply {
                     putExtra("matchID", user.matchID)
                     putExtra("senderID", userID)
-                    putExtra("nickname", user.nickname) // ส่ง nickname ของคู่สนทนาไปด้วย
+                    putExtra("nickname", user.nickname)
                 }
                 startActivity(intent)
             }
 
-
             profileImage.setOnClickListener {
                 val intent = Intent(requireContext(), OtherProfileActivity::class.java).apply {
                     putExtra("userID", user.userID)
-                    putExtra("nickname", user.nickname)
                 }
                 startActivity(intent)
+            }
+
+            // จัดการปุ่มบล็อค/ปลดบล็อค/ลบแชท
+            buttonBlockChat.setOnClickListener {
+                blockChat(user.matchID)
+            }
+
+            buttonUnblockChat.setOnClickListener {
+                unblockChat(user.matchID)
+            }
+
+            buttonDeleteChat.setOnClickListener {
+                deleteChat(user.matchID)
             }
 
             userListLayout.addView(userView)
         }
     }
 
-    // ฟังก์ชันสำหรับแปลง timestamp ให้เป็นรูปแบบ HH:mm
+    private fun blockChat(matchID: Int) {
+        lifecycleScope.launch(Dispatchers.IO) {
+            val url = getString(R.string.root_url) + "/api/block-chat"
+            val requestBody = FormBody.Builder()
+                .add("userID", userID.toString())
+                .add("matchID", matchID.toString())
+                .add("isBlocked", "1")
+                .build()
+
+            val request = Request.Builder().url(url).post(requestBody).build()
+
+            try {
+                val response = client.newCall(request).execute()
+                if (response.isSuccessful) {
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(requireContext(), "บล็อกแชทเรียบร้อย", Toast.LENGTH_SHORT).show()
+                        fetchMatchedUsers { displayUsers() }
+                    }
+                } else {
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(requireContext(), "ไม่สามารถบล็อคแชทได้ ลองใหม่อีกครั้ง", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            } catch (e: IOException) {
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(requireContext(), "เกิดข้อผิดพลาด: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
+    private fun unblockChat(matchID: Int) {
+        lifecycleScope.launch(Dispatchers.IO) {
+            val url = getString(R.string.root_url) + "/api/unblock-chat"
+            val requestBody = FormBody.Builder()
+                .add("userID", userID.toString())
+                .add("matchID", matchID.toString())
+                .build()
+
+            val request = Request.Builder().url(url).post(requestBody).build()
+
+            try {
+                val response = client.newCall(request).execute()
+                if (response.isSuccessful) {
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(requireContext(), "ปลดบล็อคแชทเรียบร้อย", Toast.LENGTH_SHORT).show()
+                        fetchMatchedUsers { displayUsers() }
+                    }
+                } else {
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(requireContext(), "ไม่สามารถปลดบล็อคแชทได้ ลองใหม่อีกครั้ง", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            } catch (e: IOException) {
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(requireContext(), "เกิดข้อผิดพลาด: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
+    private fun deleteChat(matchID: Int) {
+        lifecycleScope.launch(Dispatchers.IO) {
+            val url = getString(R.string.root_url) + "/api/delete-chat"
+            val requestBody = FormBody.Builder()
+                .add("userID", userID.toString())
+                .add("matchID", matchID.toString())
+                .build()
+
+            val request = Request.Builder().url(url).post(requestBody).build()
+
+            try {
+                val response = client.newCall(request).execute()
+                if (response.isSuccessful) {
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(requireContext(), "ลบแชทเรียบร้อย", Toast.LENGTH_SHORT).show()
+                        fetchMatchedUsers { displayUsers() }
+                    }
+                } else {
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(requireContext(), "ไม่สามารถลบแชทได้ ลองใหม่อีกครั้ง", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            } catch (e: IOException) {
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(requireContext(), "เกิดข้อผิดพลาด: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
     private fun formatTime(timestamp: String?): String {
         return if (timestamp != null) {
             try {
@@ -136,14 +240,13 @@ class MessageFragment : Fragment() {
                 val date = inputFormat.parse(timestamp)
                 outputFormat.format(date)
             } catch (e: Exception) {
-                timestamp // หากเกิดข้อผิดพลาด แสดง timestamp เดิม
+                timestamp
             }
         } else {
             ""
         }
     }
 
-    // ดึงข้อมูลผู้ใช้ที่จับคู่จาก API
     private fun fetchMatchedUsers(callback: (List<MatchedUser>) -> Unit) {
         lifecycleScope.launch(Dispatchers.IO) {
             val url = getString(R.string.root_url) + "/api/matches/$userID"
@@ -156,6 +259,8 @@ class MessageFragment : Fragment() {
                     val responseBody = response.body?.string()
                     Log.d("API Response", responseBody ?: "ไม่มีการตอบกลับ")
                     val matchedUsersList = parseUsers(responseBody)
+
+                    // ตรวจสอบว่ามีข้อความใหม่ถูกส่งเข้ามาหรือไม่
                     withContext(Dispatchers.Main) {
                         callback(matchedUsersList)
                     }
@@ -172,6 +277,7 @@ class MessageFragment : Fragment() {
         }
     }
 
+
     private fun parseUsers(responseBody: String?): List<MatchedUser> {
         val users = mutableListOf<MatchedUser>()
         responseBody?.let {
@@ -184,7 +290,8 @@ class MessageFragment : Fragment() {
                     jsonObject.getString("imageFile"),
                     jsonObject.optString("lastMessage"),
                     jsonObject.getInt("matchID"),
-                    jsonObject.optString("lastInteraction") // ดึง lastInteraction
+                    jsonObject.optString("lastInteraction"),
+                    jsonObject.optBoolean("isBlocked")
                 )
                 users.add(user)
             }
@@ -205,5 +312,6 @@ data class MatchedUser(
     val profilePicture: String,
     val lastMessage: String?,
     val matchID: Int,
-    val lastInteraction: String? // เพิ่ม lastInteraction
+    val lastInteraction: String?,
+    val isBlocked: Boolean
 )
