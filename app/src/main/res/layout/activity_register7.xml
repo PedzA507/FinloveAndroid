@@ -65,6 +65,7 @@
         android:id="@+id/buttonNextStep7"
         android:layout_width="93dp"
         android:layout_height="93dp"
+        android:layout_marginStart="160dp"
         android:layout_marginTop="50dp"
         android:background="@drawable/cyclebutton"
         android:scaleX="0.8"

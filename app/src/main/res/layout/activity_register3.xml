@@ -96,7 +96,7 @@
 
     <EditText
         android:id="@+id/editTextHeight"
-        android:layout_width="300dp"
+        android:layout_width="280dp"
         android:layout_height="55dp"
         android:layout_marginTop="10dp"
         android:background="@drawable/edittext"
@@ -124,7 +124,7 @@
 
     <EditText
         android:id="@+id/editTextPhoneNumber"
-        android:layout_width="300dp"
+        android:layout_width="280dp"
         android:layout_height="55dp"
         android:layout_marginTop="10dp"
         android:background="@drawable/edittext"
@@ -139,8 +139,8 @@
         android:id="@+id/buttonNextStep3"
         android:layout_width="100dp"
         android:layout_height="100dp"
+        android:layout_marginStart="40dp"
         android:layout_marginTop="50dp"
-        android:layout_marginEnd="7dp"
         android:background="@drawable/cyclebutton"
         android:scaleType="centerInside"
         android:scaleX="0.8"

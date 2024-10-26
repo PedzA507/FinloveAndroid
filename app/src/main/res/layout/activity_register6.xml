@@ -80,6 +80,7 @@
         android:id="@+id/buttonNextStep6"
         android:layout_width="93dp"
         android:layout_height="93dp"
+        android:layout_marginStart="180dp"
         android:layout_marginTop="50dp"
         android:background="@drawable/cyclebutton"
         android:scaleX="0.8"
