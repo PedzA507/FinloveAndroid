@@ -84,9 +84,8 @@ class HomeFragment : Fragment() {
         val nickname: TextView = userView.findViewById(R.id.textNickname)
         val profileImage: ImageView = userView.findViewById(R.id.imageProfile)
         val verifiedIcon: ImageView = userView.findViewById(R.id.imageVerified) // ไอคอนเครื่องหมายถูก
-        val likeButton: Button = userView.findViewById(R.id.buttonLike)
-        val dislikeButton: Button = userView.findViewById(R.id.buttonDislike)
-        val reportButton: Button = userView.findViewById(R.id.buttonReport)
+        val likeButton: ImageButton = userView.findViewById(R.id.buttonLike)
+        val dislikeButton: ImageButton = userView.findViewById(R.id.buttonDislike)
 
         nickname.text = user.nickname
         Glide.with(requireContext()).load(user.profilePicture).into(profileImage)
@@ -106,11 +105,6 @@ class HomeFragment : Fragment() {
         // เมื่อกดปุ่ม "Dislike"
         dislikeButton.setOnClickListener {
             dislikeUser(user.userID)
-        }
-
-        // เมื่อกดปุ่มรายงาน
-        reportButton.setOnClickListener {
-            showReportDialog(user.userID)
         }
 
         // เพิ่ม View ที่สร้างขึ้นใหม่ไปยัง LinearLayout

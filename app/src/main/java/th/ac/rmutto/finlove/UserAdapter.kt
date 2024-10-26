@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -39,9 +40,8 @@ class UserAdapter(private val users: List<User>, private val currentUserID: Int)
     class UserViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val nickname: TextView = itemView.findViewById(R.id.textNickname)
         private val profileImage: ImageView = itemView.findViewById(R.id.imageProfile)
-        private val likeButton: Button = itemView.findViewById(R.id.buttonLike)
-        private val dislikeButton: Button = itemView.findViewById(R.id.buttonDislike)
-        private val reportButton: Button = itemView.findViewById(R.id.buttonReport)
+        private val likeButton: ImageButton = itemView.findViewById(R.id.buttonLike)
+        private val dislikeButton: ImageButton = itemView.findViewById(R.id.buttonDislike)
 
         // ฟังก์ชัน bind สำหรับกำหนดข้อมูลให้กับ View
         fun bind(user: User, currentUserID: Int) {
@@ -58,10 +58,6 @@ class UserAdapter(private val users: List<User>, private val currentUserID: Int)
                 dislikeUser(user.id, currentUserID) // ส่ง id ของผู้ใช้ที่ต้องการไม่ชอบ
             }
 
-            // กดรายงานผู้ใช้
-            reportButton.setOnClickListener {
-                Toast.makeText(itemView.context, "รายงานผู้ใช้: ${user.nickname}", Toast.LENGTH_SHORT).show()
-            }
         }
 
         // ฟังก์ชันที่ใช้ในการส่ง HTTP POST ไปยัง API
