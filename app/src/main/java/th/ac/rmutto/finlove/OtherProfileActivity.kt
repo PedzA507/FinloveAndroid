@@ -3,6 +3,7 @@ package th.ac.rmutto.finlove
 import android.app.AlertDialog
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
@@ -25,6 +26,7 @@ class OtherProfileActivity : AppCompatActivity() {
     private lateinit var genderTextView: TextView
     private lateinit var preferencesContainer: LinearLayout
     private lateinit var reportButton: Button
+    private lateinit var verifiedIcon: ImageView // เพิ่มการประกาศตัวแปร verifiedIcon
     private val client = OkHttpClient()
     private var userID: Int = -1
 
@@ -40,6 +42,7 @@ class OtherProfileActivity : AppCompatActivity() {
         genderTextView = findViewById(R.id.textViewGender)
         preferencesContainer = findViewById(R.id.preferenceContainer)
         reportButton = findViewById(R.id.buttonReportUser)
+        verifiedIcon = findViewById(R.id.verifiedIcon) // เชื่อมโยง verifiedIcon
 
         // Get the userID from intent
         userID = intent.getIntExtra("userID", -1)
@@ -76,6 +79,7 @@ class OtherProfileActivity : AppCompatActivity() {
                     val gender = jsonObject.optString("gender")
                     val preferences = jsonObject.optString("preferences")
                     val profileImage = jsonObject.optString("imageFile")
+                    val isVerified = jsonObject.optInt("verify", 0) == 1 // Check if user is verified
 
                     // Update UI on the main thread
                     withContext(Dispatchers.Main) {
@@ -88,6 +92,9 @@ class OtherProfileActivity : AppCompatActivity() {
                         Glide.with(this@OtherProfileActivity)
                             .load(profileImage)
                             .into(profileImageView)
+
+                        // Show verified icon if user is verified
+                        verifiedIcon.visibility = if (isVerified) View.VISIBLE else View.GONE
 
                         // Update preferences
                         updateUserPreferences(preferences)
