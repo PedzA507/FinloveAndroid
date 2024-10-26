@@ -83,12 +83,20 @@ class HomeFragment : Fragment() {
         // กำหนดข้อมูลผู้ใช้ใน View
         val nickname: TextView = userView.findViewById(R.id.textNickname)
         val profileImage: ImageView = userView.findViewById(R.id.imageProfile)
+        val verifiedIcon: ImageView = userView.findViewById(R.id.imageVerified) // ไอคอนเครื่องหมายถูก
         val likeButton: Button = userView.findViewById(R.id.buttonLike)
         val dislikeButton: Button = userView.findViewById(R.id.buttonDislike)
         val reportButton: Button = userView.findViewById(R.id.buttonReport)
 
         nickname.text = user.nickname
         Glide.with(requireContext()).load(user.profilePicture).into(profileImage)
+
+        // ตรวจสอบสถานะ verify และแสดงไอคอนเครื่องหมายถูกหาก verify == 1
+        if (user.verify == 1) {
+            verifiedIcon.visibility = View.VISIBLE
+        } else {
+            verifiedIcon.visibility = View.GONE
+        }
 
         // เมื่อกดปุ่ม "Like"
         likeButton.setOnClickListener {
@@ -108,6 +116,7 @@ class HomeFragment : Fragment() {
         // เพิ่ม View ที่สร้างขึ้นใหม่ไปยัง LinearLayout
         userListLayout.addView(userView)
     }
+
 
     // ฟังก์ชันแสดง Dialog สำหรับการรายงานผู้ใช้
     private fun showReportDialog(reportedID: Int) {
@@ -307,7 +316,8 @@ class HomeFragment : Fragment() {
                 val user = User(
                     jsonObject.getInt("UserID"),
                     jsonObject.getString("nickname"),
-                    jsonObject.getString("imageFile")
+                    jsonObject.getString("imageFile"),
+                    jsonObject.getInt("verify")
                 )
                 users.add(user)
             }
@@ -322,4 +332,10 @@ class HomeFragment : Fragment() {
 }
 
 // คลาสสำหรับเก็บข้อมูลผู้ใช้
-data class User(val userID: Int, val nickname: String, val profilePicture: String)
+data class User(
+    val userID: Int,
+    val nickname: String,
+    val profilePicture: String,
+    val verify: Int // ฟิลด์สำหรับสถานะการยืนยัน
+)
+

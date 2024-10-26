@@ -12,19 +12,45 @@
         android:scaleType="centerCrop"
         android:src="@drawable/ic_user" />
 
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="8dp">
+
+        <!-- TextView สำหรับชื่อและเครื่องหมายถูก -->
+        <TextView
+            android:id="@+id/textNickname"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Nickname"
+            android:textSize="24sp"
+            android:layout_marginEnd="4dp" />
+
+        <!-- ไอคอนเครื่องหมายถูก -->
+        <ImageView
+            android:id="@+id/imageVerified"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/verify"
+        android:visibility="gone" />
+    </LinearLayout>
+
     <TextView
-        android:id="@+id/textNickname"
-        android:layout_width="138dp"
-        android:layout_height="47dp"
-        android:layout_marginStart="16dp"
-        android:text="Nickname"
-        android:textSize="24sp" />
+        android:id="@+id/textPreferences"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="ความชอบ:"
+        android:textSize="18sp"
+        android:layout_marginTop="8dp" />
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:layout_marginTop="8dp">
 
+        <!-- แสดงปุ่มความชอบตามที่ต้องการ -->
         <Button
             android:id="@+id/buttonLike"
             android:layout_width="wrap_content"
@@ -36,7 +62,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Dislike" />
-
 
         <Button
             android:id="@+id/buttonReport"
