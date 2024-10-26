@@ -24,6 +24,8 @@ import th.ac.rmutto.finlove.ChatActivity
 import th.ac.rmutto.finlove.OtherProfileActivity
 import th.ac.rmutto.finlove.R
 import th.ac.rmutto.finlove.databinding.FragmentMessageBinding
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 class MessageFragment : Fragment() {
 
@@ -88,7 +90,7 @@ class MessageFragment : Fragment() {
 
     private fun displayUsers() {
         val userListLayout: LinearLayout = binding.userListLayout
-        userListLayout.removeAllViews() // ลบรายการก่อนหน้าออก
+        userListLayout.removeAllViews()
 
         matchedUsers.forEach { user ->
             val userView = LayoutInflater.from(requireContext()).inflate(R.layout.item_message, userListLayout, false)
@@ -96,30 +98,45 @@ class MessageFragment : Fragment() {
             val nickname: TextView = userView.findViewById(R.id.textNickname)
             val profileImage: ImageView = userView.findViewById(R.id.imageProfile)
             val lastMessage: TextView = userView.findViewById(R.id.lastMessage)
+            val lastInteraction: TextView = userView.findViewById(R.id.textLastInteraction)
 
             nickname.text = user.nickname
             lastMessage.text = user.lastMessage ?: "ไม่มีข้อความล่าสุด"
+            lastInteraction.text = formatTime(user.lastInteraction) // แสดง timestamp ที่แปลงเป็น HH:mm
             Glide.with(requireContext()).load(user.profilePicture).into(profileImage)
 
-            // เมื่อกดที่รายการให้ไปยังหน้า ChatActivity
             userView.setOnClickListener {
                 val intent = Intent(requireContext(), ChatActivity::class.java).apply {
-                    putExtra("matchID", user.matchID)  // ส่ง matchID ไปยัง ChatActivity
-                    putExtra("senderID", userID)  // ส่ง userID ของผู้ใช้ที่ล็อกอินไปด้วย (คือ senderID)
+                    putExtra("matchID", user.matchID)
+                    putExtra("senderID", userID)
                 }
                 startActivity(intent)
             }
 
-            // เพิ่มฟังก์ชันการกดที่รูปโปรไฟล์เพื่อไปหน้า OtherProfileActivity
             profileImage.setOnClickListener {
                 val intent = Intent(requireContext(), OtherProfileActivity::class.java).apply {
-                    putExtra("userID", user.userID)  // ส่ง userID ของคู่สนทนาไปหน้าโปรไฟล์
+                    putExtra("userID", user.userID)
                 }
                 startActivity(intent)
             }
 
-            // เพิ่ม view ของผู้ใช้แต่ละคนเข้าไปใน layout
             userListLayout.addView(userView)
+        }
+    }
+
+    // ฟังก์ชันสำหรับแปลง timestamp ให้เป็นรูปแบบ HH:mm
+    private fun formatTime(timestamp: String?): String {
+        return if (timestamp != null) {
+            try {
+                val inputFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSSSS", Locale.getDefault())
+                val outputFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
+                val date = inputFormat.parse(timestamp)
+                outputFormat.format(date)
+            } catch (e: Exception) {
+                timestamp // หากเกิดข้อผิดพลาด แสดง timestamp เดิม
+            }
+        } else {
+            ""
         }
     }
 
@@ -163,7 +180,8 @@ class MessageFragment : Fragment() {
                     jsonObject.getString("nickname"),
                     jsonObject.getString("imageFile"),
                     jsonObject.optString("lastMessage"),
-                    jsonObject.getInt("matchID")
+                    jsonObject.getInt("matchID"),
+                    jsonObject.optString("lastInteraction") // ดึง lastInteraction
                 )
                 users.add(user)
             }
@@ -183,5 +201,6 @@ data class MatchedUser(
     val nickname: String,
     val profilePicture: String,
     val lastMessage: String?,
-    val matchID: Int
+    val matchID: Int,
+    val lastInteraction: String? // เพิ่ม lastInteraction
 )

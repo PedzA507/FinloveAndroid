@@ -36,6 +36,15 @@
             android:textColor="@android:color/black" />
 
         <TextView
+            android:id="@+id/textLastInteraction"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="12:34"
+            android:textSize="12sp"
+            android:textColor="@android:color/darker_gray" />
+
+
+        <TextView
             android:id="@+id/lastMessage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
