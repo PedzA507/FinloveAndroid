@@ -7,6 +7,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -52,9 +53,8 @@ class ProfileFragment : Fragment() {
 
     private lateinit var buttonEditProfile: ImageButton
     private lateinit var buttonSaveProfile: Button
-    private lateinit var buttonChangeImage: Button
     private lateinit var buttonEditPreferences: Button
-    private lateinit var buttonVerify: Button // ปุ่มยืนยันตัวตนที่เพิ่มเข้ามา
+    private lateinit var buttonVerify: Button
     private lateinit var buttonLogout: Button
     private lateinit var buttonDeleteAccount: Button
     private var selectedImageUri: Uri? = null
@@ -63,8 +63,8 @@ class ProfileFragment : Fragment() {
     private val PICK_IMAGE_REQUEST = 1
     private val REQUEST_CODE_CHANGE_PREFERENCES = 1001
 
-    private lateinit var originalUser: User // Original user data
-    private lateinit var currentUser: User // Edited user data
+    private lateinit var originalUser: User
+    private lateinit var currentUser: User
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -103,19 +103,23 @@ class ProfileFragment : Fragment() {
         spinnerGoal = root.findViewById(R.id.spinnerGoal)
         preferenceContainer = root.findViewById(R.id.preferenceContainer)
 
-        buttonChangeImage = root.findViewById(R.id.buttonChangeImage)
         buttonEditProfile = root.findViewById(R.id.buttonEditProfile)
         buttonSaveProfile = root.findViewById(R.id.buttonSaveProfile)
         buttonLogout = root.findViewById(R.id.buttonLogout)
         buttonDeleteAccount = root.findViewById(R.id.buttonDeleteAccount)
         buttonEditPreferences = root.findViewById(R.id.buttonEditPreferences)
-        buttonVerify = root.findViewById(R.id.buttonVerify) // ปุ่มยืนยันตัวตน
+        buttonVerify = root.findViewById(R.id.buttonVerify)
         verifyBadge = root.findViewById(R.id.verifyBadge)
 
         setupSpinners()
 
         // Hide fields initially
         hideFieldsForViewingMode()
+
+        // Set click listener on imageViewProfile for changing image
+        imageViewProfile.setOnClickListener {
+            selectImage()
+        }
 
         // Setup button listeners
         buttonEditProfile.setOnClickListener {
@@ -124,10 +128,6 @@ class ProfileFragment : Fragment() {
 
         buttonSaveProfile.setOnClickListener {
             saveUserInfo(requireActivity().intent.getIntExtra("userID", -1))
-        }
-
-        buttonChangeImage.setOnClickListener {
-            selectImage()
         }
 
         buttonDeleteAccount.setOnClickListener {
@@ -146,12 +146,12 @@ class ProfileFragment : Fragment() {
 
         buttonVerify.setOnClickListener {
             val intent = Intent(requireContext(), AddphotoActivity::class.java)
-            intent.putExtra("userID", requireActivity().intent.getIntExtra("userID", -1))  // ส่ง userID ไปยัง AddphotoActivity
+            intent.putExtra("userID", requireActivity().intent.getIntExtra("userID", -1))
             startActivity(intent)
         }
 
         buttonSelectDateProfile.setOnClickListener {
-            showDatePicker() // Fix for date picker
+            showDatePicker()
         }
     }
 
@@ -193,7 +193,6 @@ class ProfileFragment : Fragment() {
         isEditing = !isEditing
         setEditingEnabled(isEditing)
         if (isEditing) {
-            buttonChangeImage.visibility = View.VISIBLE
             buttonSaveProfile.visibility = View.VISIBLE
             buttonEditPreferences.visibility = View.VISIBLE
 
@@ -221,27 +220,25 @@ class ProfileFragment : Fragment() {
                 .into(imageViewProfile)
         } else if (requestCode == REQUEST_CODE_CHANGE_PREFERENCES && resultCode == AppCompatActivity.RESULT_OK && data != null) {
             val updatedPreferences = data.getStringExtra("preferences")
-            updateUserPreferences(updatedPreferences)
+            loadPreferences(updatedPreferences)
         }
     }
 
-    private fun updateUserPreferences(preferences: String?) {
+    private fun loadPreferences(preferences: String?) {
         preferenceContainer.removeAllViews()
         val preferencesArray = preferences?.split(",") ?: listOf()
         for (preference in preferencesArray) {
             val preferenceTextView = TextView(requireContext())
             preferenceTextView.text = preference
-            preferenceTextView.setBackgroundResource(R.drawable.rounded_preference_box)
+            preferenceTextView.setBackgroundResource(R.drawable.show_preference)
             preferenceTextView.setPadding(16, 16, 16, 16)
-            preferenceTextView.textSize = 18f // เพิ่มขนาดตัวอักษร
+            preferenceTextView.textSize = 14f
+            preferenceTextView.setTypeface(null, android.graphics.Typeface.BOLD) // ทำตัวหนังสือหนา
+            preferenceTextView.gravity = Gravity.CENTER // จัดให้ตัวหนังสืออยู่ตรงกลาง
+            preferenceTextView.setTextColor(resources.getColor(R.color.white))
 
-            // เพิ่มระยะห่างระหว่างบล็อก
-            val layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            )
-            layoutParams.setMargins(16, 16, 16, 16) // กำหนดระยะห่างระหว่างบล็อก
-
+            val layoutParams = LinearLayout.LayoutParams(250, 150) // กำหนดขนาดเป็น 50x50
+            layoutParams.setMargins(16, 16, 16, 16)
             preferenceTextView.layoutParams = layoutParams
             preferenceContainer.addView(preferenceTextView)
         }
@@ -261,11 +258,6 @@ class ProfileFragment : Fragment() {
                     withContext(Dispatchers.Main) {
                         originalUser = user
                         updateUserFields(user)
-
-                        // Log ค่า verify เพื่อตรวจสอบ
-                        Log.d("ProfileFragment", "User verify status: ${user.verify}")
-
-                        // แสดงหรือซ่อน verifyBadge ตามค่า verify
                         verifyBadge.visibility = if (user.verify == 1) View.VISIBLE else View.GONE
                     }
                 } else {
@@ -291,31 +283,11 @@ class ProfileFragment : Fragment() {
         textViewHome.setText(user.home)
         buttonSelectDateProfile.text = user.dateBirth
 
-        // Set user's nickname in the toolbar dynamically
         val toolbar = requireActivity().findViewById<Toolbar>(R.id.toolbarProfile)
         val toolbarTitle = toolbar.findViewById<TextView>(R.id.toolbarTitle)
-        toolbarTitle.text = user.nickname // ใช้ nickname จาก user แทนการกำหนดค่าตรง ๆ
+        toolbarTitle.text = user.nickname
 
-        preferenceContainer.removeAllViews()
-        val preferencesArray = user.preferences?.split(",") ?: listOf()
-        for (preference in preferencesArray) {
-            val preferenceTextView = TextView(requireContext())
-            preferenceTextView.text = preference
-            preferenceTextView.setBackgroundResource(R.drawable.show_preference)
-            preferenceTextView.setPadding(16, 16, 16, 16)
-
-            preferenceTextView.textSize = 18f
-            preferenceTextView.setTextColor(resources.getColor(R.color.white))
-
-            val layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-            )
-            layoutParams.setMargins(16, 16, 16, 16)
-
-            preferenceTextView.layoutParams = layoutParams
-            preferenceContainer.addView(preferenceTextView)
-        }
+        loadPreferences(user.preferences)
 
         val genderIndex = resources.getStringArray(R.array.gender_array).indexOf(user.gender)
         if (genderIndex >= 0) {
@@ -340,6 +312,13 @@ class ProfileFragment : Fragment() {
         user.imageFile?.let { loadImage(it, imageViewProfile) }
     }
 
+    private fun loadImage(url: String, imageView: ImageView) {
+        Glide.with(this)
+            .load(url)
+            .placeholder(R.drawable.img_1)
+            .error(R.drawable.error)
+            .into(imageView)
+    }
 
     private fun saveUserInfo(userID: Int) {
         CoroutineScope(Dispatchers.IO).launch {
@@ -413,14 +392,6 @@ class ProfileFragment : Fragment() {
         }
     }
 
-    private fun loadImage(url: String, imageView: ImageView) {
-        Glide.with(this)
-            .load(url)
-            .placeholder(R.drawable.img_1)
-            .error(R.drawable.error)
-            .into(imageView)
-    }
-
     private fun showDatePicker() {
         val calendar = Calendar.getInstance()
         val year = calendar.get(Calendar.YEAR)
@@ -432,7 +403,7 @@ class ProfileFragment : Fragment() {
             buttonSelectDateProfile.text = selectedDateOfBirth
         }, year, month, day)
 
-        datePickerDialog.datePicker.maxDate = System.currentTimeMillis() // Disable future dates
+        datePickerDialog.datePicker.maxDate = System.currentTimeMillis()
         datePickerDialog.show()
     }
 
@@ -448,8 +419,7 @@ class ProfileFragment : Fragment() {
         spinnerGoal.isEnabled = enabled
         textViewHeight.isEnabled = enabled
         textViewHome.isEnabled = enabled
-        buttonSelectDateProfile.isEnabled = enabled // เปิดใช้งานปุ่มเลือกวันเกิด
-        buttonChangeImage.isEnabled = enabled
+        buttonSelectDateProfile.isEnabled = enabled
         buttonSaveProfile.isEnabled = enabled
     }
 
@@ -465,7 +435,6 @@ class ProfileFragment : Fragment() {
     }
 
     private fun hideFieldsForViewingMode() {
-        // Initially show only Firstname, Lastname, Nickname, Gender, Preference
         textViewUsername.visibility = View.GONE
         textViewEmail.visibility = View.GONE
         textViewHeight.visibility = View.GONE
@@ -475,7 +444,6 @@ class ProfileFragment : Fragment() {
         spinnerEducation.visibility = View.GONE
         spinnerInterestGender.visibility = View.GONE
 
-        buttonChangeImage.visibility = View.GONE
         buttonSaveProfile.visibility = View.GONE
         buttonEditPreferences.visibility = View.GONE
     }
@@ -562,9 +530,7 @@ class ProfileFragment : Fragment() {
             home = jsonObject.optString("home", ""),
             dateBirth = jsonObject.optString("DateBirth", ""),
             imageFile = jsonObject.optString("imageFile", ""),
-            verify = jsonObject.optInt("verify", 0) // อ่านค่า verify
+            verify = jsonObject.optInt("verify", 0)
         )
     }
-
-
 }
