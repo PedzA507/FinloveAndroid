@@ -203,17 +203,20 @@ class ProfileFragment : Fragment() {
     private fun toggleEditMode() {
         isEditing = !isEditing
         setEditingEnabled(isEditing)
+
         if (isEditing) {
             buttonSaveProfile.visibility = View.VISIBLE
             buttonEditPreferences.visibility = View.VISIBLE
+            buttonDeleteAccount.visibility = View.VISIBLE
 
             currentUser = originalUser.copy()
-            showAllFields()
+            showAllFields() // แสดงฟิลด์ทั้งหมดเมื่อเข้าสู่โหมดแก้ไข
         } else {
             restoreOriginalUserInfo()
-            hideFieldsForViewingMode()
+            hideFieldsForViewingMode() // ซ่อนฟิลด์ที่ไม่จำเป็นเมื่อออกจากโหมดแก้ไข
         }
     }
+
 
     private fun selectImage() {
         val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
@@ -413,15 +416,27 @@ class ProfileFragment : Fragment() {
         val month = calendar.get(Calendar.MONTH)
         val day = calendar.get(Calendar.DAY_OF_MONTH)
 
-        val datePickerDialog = DatePickerDialog(requireContext(), { _, selectedYear, selectedMonth, selectedDay ->
-            selectedDateOfBirth = "$selectedYear-${String.format("%02d", selectedMonth + 1)}-${String.format("%02d", selectedDay)}"
-            buttonSelectDateProfile.text = selectedDateOfBirth
-        }, year, month, day)
+        // Calculate the maximum date as 18 years before today
+        calendar.add(Calendar.YEAR, -18)
+        val eighteenYearsAgo = calendar.timeInMillis
 
-        datePickerDialog.datePicker.maxDate = System.currentTimeMillis()
+        val datePickerDialog = DatePickerDialog(
+            requireContext(),
+            { _, selectedYear, selectedMonth, selectedDay ->
+                selectedDateOfBirth = "$selectedYear-${String.format("%02d", selectedMonth + 1)}-${String.format("%02d", selectedDay)}"
+                buttonSelectDateProfile.text = selectedDateOfBirth
+            },
+            year,
+            month,
+            day
+        )
+
+        datePickerDialog.datePicker.maxDate = eighteenYearsAgo
         datePickerDialog.show()
     }
 
+
+    // ProfileFragment.kt
     // ProfileFragment.kt
     private fun setEditingEnabled(enabled: Boolean) {
         textViewUsername.isFocusable = enabled
@@ -434,17 +449,19 @@ class ProfileFragment : Fragment() {
         textViewFirstName.isFocusableInTouchMode = enabled
         textViewLastName.isFocusable = enabled
         textViewLastName.isFocusableInTouchMode = enabled
-        spinnerGender.isEnabled = enabled
-        spinnerInterestGender.isEnabled = enabled
-        spinnerEducation.isEnabled = enabled
-        spinnerGoal.isEnabled = enabled
         textViewHeight.isFocusable = enabled
         textViewHeight.isFocusableInTouchMode = enabled
         textViewHome.isFocusable = enabled
         textViewHome.isFocusableInTouchMode = enabled
+        spinnerGender.isEnabled = enabled
+        spinnerInterestGender.isEnabled = enabled
+        spinnerEducation.isEnabled = enabled
+        spinnerGoal.isEnabled = enabled
         buttonSelectDateProfile.isEnabled = enabled
         buttonSaveProfile.isEnabled = enabled
+        buttonDeleteAccount.isEnabled = enabled
     }
+
 
 
     private fun showAllFields() {
@@ -467,7 +484,7 @@ class ProfileFragment : Fragment() {
         spinnerGoal.visibility = View.GONE
         spinnerEducation.visibility = View.GONE
         spinnerInterestGender.visibility = View.GONE
-
+        buttonDeleteAccount.visibility = View.GONE
         buttonSaveProfile.visibility = View.GONE
         buttonEditPreferences.visibility = View.GONE
     }
