@@ -70,6 +70,12 @@ class RegisterActivity4 : AppCompatActivity() {
                 return@setOnClickListener
             }
 
+            // ตรวจสอบว่าอายุถึงเกณฑ์ 18 ปีหรือไม่
+            if (!isAgeAboveOrEqual18(selectedDateOfBirth!!)) {
+                Toast.makeText(this, "อายุของคุณต้องมากกว่าหรือเท่ากับ 18 ปี", Toast.LENGTH_LONG).show()
+                return@setOnClickListener
+            }
+
             // รับข้อมูลจากหน้า RegisterActivity3
             val email = intent.getStringExtra("email")
             val username = intent.getStringExtra("username")
@@ -123,5 +129,25 @@ class RegisterActivity4 : AppCompatActivity() {
             button.isSelected = true
             selectedEducation = education
         }
+    }
+
+    // ฟังก์ชันตรวจสอบอายุ
+    private fun isAgeAboveOrEqual18(birthDate: String): Boolean {
+        val parts = birthDate.split("-")
+        val birthYear = parts[0].toInt()
+        val birthMonth = parts[1].toInt()
+        val birthDay = parts[2].toInt()
+
+        val today = Calendar.getInstance()
+        var age = today.get(Calendar.YEAR) - birthYear
+
+        // ลดอายุลง 1 ปีหากวันเกิดยังไม่ถึงในปีนี้
+        if (today.get(Calendar.MONTH) + 1 < birthMonth ||
+            (today.get(Calendar.MONTH) + 1 == birthMonth && today.get(Calendar.DAY_OF_MONTH) < birthDay)) {
+            age -= 1
+        }
+
+        // ตรวจสอบว่าอายุมากกว่าหรือเท่ากับ 18 ปี
+        return age >= 18
     }
 }
