@@ -33,9 +33,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Nickname"
+                android:textColor="@android:color/black"
                 android:textSize="18sp"
-                android:textStyle="bold"
-                android:textColor="@android:color/black" />
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/lastMessage"
@@ -44,46 +44,19 @@
                 android:ellipsize="end"
                 android:maxLines="1"
                 android:text="Last message preview"
-                android:textSize="14sp"
-                android:textColor="#666363" />
+                android:textColor="#666363"
+                android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/textLastInteraction"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="12:34"
-                android:textSize="12sp"
-                android:textColor="#666363" />
+                android:textColor="#666363"
+                android:textSize="12sp" />
         </LinearLayout>
-    </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="end"
-        android:paddingTop="8dp">
-
-        <Button
-            android:id="@+id/buttonBlockChat"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="บล็อคแชท"
-            android:textStyle="bold"
-            android:textColor="@android:color/white"
-            android:background="@drawable/button"
-            android:layout_marginEnd="8dp" />
-
-        <Button
-            android:id="@+id/buttonUnblockChat"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="ปลดบล็อคแชท"
-            android:textStyle="bold"
-            android:textColor="@android:color/white"
-            android:background="@drawable/button"
-            android:layout_marginEnd="8dp" />
-
+        <!-- Delete button aligned to the right -->
         <Button
             android:id="@+id/buttonDeleteChat"
             android:layout_width="wrap_content"
@@ -93,4 +66,5 @@
             android:textColor="@android:color/white"
             android:background="@drawable/button" />
     </LinearLayout>
+
 </LinearLayout>

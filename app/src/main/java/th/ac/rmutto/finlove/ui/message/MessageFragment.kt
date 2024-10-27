@@ -38,17 +38,17 @@ class MessageFragment : Fragment() {
     private val client = OkHttpClient()
     private var matchedUsers = listOf<MatchedUser>()
     private val handler = Handler()
-    private val refreshInterval = 2000L // รีเฟรชทุก 2 วินาที
+    private val refreshInterval = 2000L // Refresh every 2 seconds
 
     private val refreshRunnable = object : Runnable {
         override fun run() {
             fetchMatchedUsers { fetchedUsers ->
                 if (fetchedUsers.isNotEmpty()) {
                     matchedUsers = fetchedUsers
-                    displayUsers() // อัปเดต UI ด้วยข้อมูลล่าสุด
+                    displayUsers() // Update UI with the latest data
                 }
             }
-            handler.postDelayed(this, refreshInterval) // กำหนดการรีเฟรชครั้งถัดไป
+            handler.postDelayed(this, refreshInterval) // Schedule the next refresh
         }
     }
 
@@ -59,14 +59,14 @@ class MessageFragment : Fragment() {
         _binding = FragmentMessageBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        // รับ userID ที่ถูกส่งมาจาก MainActivity
+        // Retrieve userID passed from MainActivity
         userID = arguments?.getInt("userID", -1) ?: -1
 
         if (userID != -1) {
             fetchMatchedUsers { fetchedUsers ->
                 if (fetchedUsers.isNotEmpty()) {
                     matchedUsers = fetchedUsers
-                    displayUsers() // แสดงรายชื่อผู้ใช้ที่จับคู่
+                    displayUsers() // Display matched users
                 } else {
                     Toast.makeText(requireContext(), "ไม่พบผู้ใช้ที่จับคู่กัน", Toast.LENGTH_SHORT).show()
                 }
@@ -80,12 +80,12 @@ class MessageFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        handler.post(refreshRunnable) // เริ่มการรีเฟรชข้อมูล
+        handler.post(refreshRunnable) // Start data refresh
     }
 
     override fun onPause() {
         super.onPause()
-        handler.removeCallbacks(refreshRunnable) // หยุดการรีเฟรชข้อมูล
+        handler.removeCallbacks(refreshRunnable) // Stop data refresh
     }
 
     private fun displayUsers() {
@@ -99,8 +99,6 @@ class MessageFragment : Fragment() {
             val profileImage: ImageView = userView.findViewById(R.id.imageProfile)
             val lastMessage: TextView = userView.findViewById(R.id.lastMessage)
             val lastInteraction: TextView = userView.findViewById(R.id.textLastInteraction)
-            val buttonBlockChat: Button = userView.findViewById(R.id.buttonBlockChat)
-            val buttonUnblockChat: Button = userView.findViewById(R.id.buttonUnblockChat)
             val buttonDeleteChat: Button = userView.findViewById(R.id.buttonDeleteChat)
 
             nickname.text = user.nickname
@@ -124,81 +122,12 @@ class MessageFragment : Fragment() {
                 startActivity(intent)
             }
 
-            // จัดการปุ่มบล็อค/ปลดบล็อค/ลบแชท
-            buttonBlockChat.setOnClickListener {
-                blockChat(user.matchID)
-            }
-
-            buttonUnblockChat.setOnClickListener {
-                unblockChat(user.matchID)
-            }
-
+            // Handle delete chat button
             buttonDeleteChat.setOnClickListener {
                 deleteChat(user.matchID)
             }
 
             userListLayout.addView(userView)
-        }
-    }
-
-    private fun blockChat(matchID: Int) {
-        lifecycleScope.launch(Dispatchers.IO) {
-            val url = getString(R.string.root_url) + "/api/block-chat"
-            val requestBody = FormBody.Builder()
-                .add("userID", userID.toString())
-                .add("matchID", matchID.toString())
-                .add("isBlocked", "1")
-                .build()
-
-            val request = Request.Builder().url(url).post(requestBody).build()
-
-            try {
-                val response = client.newCall(request).execute()
-                if (response.isSuccessful) {
-                    withContext(Dispatchers.Main) {
-                        Toast.makeText(requireContext(), "บล็อกแชทเรียบร้อย", Toast.LENGTH_SHORT).show()
-                        fetchMatchedUsers { displayUsers() }
-                    }
-                } else {
-                    withContext(Dispatchers.Main) {
-                        Toast.makeText(requireContext(), "ไม่สามารถบล็อคแชทได้ ลองใหม่อีกครั้ง", Toast.LENGTH_SHORT).show()
-                    }
-                }
-            } catch (e: IOException) {
-                withContext(Dispatchers.Main) {
-                    Toast.makeText(requireContext(), "เกิดข้อผิดพลาด: ${e.message}", Toast.LENGTH_SHORT).show()
-                }
-            }
-        }
-    }
-
-    private fun unblockChat(matchID: Int) {
-        lifecycleScope.launch(Dispatchers.IO) {
-            val url = getString(R.string.root_url) + "/api/unblock-chat"
-            val requestBody = FormBody.Builder()
-                .add("userID", userID.toString())
-                .add("matchID", matchID.toString())
-                .build()
-
-            val request = Request.Builder().url(url).post(requestBody).build()
-
-            try {
-                val response = client.newCall(request).execute()
-                if (response.isSuccessful) {
-                    withContext(Dispatchers.Main) {
-                        Toast.makeText(requireContext(), "ปลดบล็อคแชทเรียบร้อย", Toast.LENGTH_SHORT).show()
-                        fetchMatchedUsers { displayUsers() }
-                    }
-                } else {
-                    withContext(Dispatchers.Main) {
-                        Toast.makeText(requireContext(), "ไม่สามารถปลดบล็อคแชทได้ ลองใหม่อีกครั้ง", Toast.LENGTH_SHORT).show()
-                    }
-                }
-            } catch (e: IOException) {
-                withContext(Dispatchers.Main) {
-                    Toast.makeText(requireContext(), "เกิดข้อผิดพลาด: ${e.message}", Toast.LENGTH_SHORT).show()
-                }
-            }
         }
     }
 
@@ -260,7 +189,6 @@ class MessageFragment : Fragment() {
                     Log.d("API Response", responseBody ?: "ไม่มีการตอบกลับ")
                     val matchedUsersList = parseUsers(responseBody)
 
-                    // ตรวจสอบว่ามีข้อความใหม่ถูกส่งเข้ามาหรือไม่
                     withContext(Dispatchers.Main) {
                         callback(matchedUsersList)
                     }
@@ -276,7 +204,6 @@ class MessageFragment : Fragment() {
             }
         }
     }
-
 
     private fun parseUsers(responseBody: String?): List<MatchedUser> {
         val users = mutableListOf<MatchedUser>()
@@ -305,7 +232,7 @@ class MessageFragment : Fragment() {
     }
 }
 
-// Data class สำหรับเก็บข้อมูลผู้ใช้ที่จับคู่
+// Data class to store matched user information
 data class MatchedUser(
     val userID: Int,
     val nickname: String,

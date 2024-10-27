@@ -1,13 +1,15 @@
 package th.ac.rmutto.finlove
 
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.View
+import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.bumptech.glide.Glide
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -24,22 +26,30 @@ class ChatActivity : AppCompatActivity() {
     private var matchID: Int = -1
     private var senderID: Int = -1
     private var receiverNickname: String = ""
+    private var isBlocked: Boolean = false
+
+    private val handler = Handler(Looper.getMainLooper())
+    private val refreshInterval = 2000L // รีเฟรชทุก 2 วินาที
+    private val refreshRunnable = object : Runnable {
+        override fun run() {
+            fetchChatMessages() // เรียกใช้การอัปเดตข้อความ
+            handler.postDelayed(this, refreshInterval) // ตั้งเวลาเรียกใช้อีกครั้ง
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityChatBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // รับค่า matchID, senderID, และ nickname ของคู่สนทนา
+        // รับ matchID, senderID, และ nickname ของคู่สนทนา
         matchID = intent.getIntExtra("matchID", -1)
         senderID = intent.getIntExtra("senderID", -1)
         receiverNickname = intent.getStringExtra("nickname") ?: ""
 
-        // ตรวจสอบค่าที่ได้รับ
         Log.d("ChatActivity", "Received matchID: $matchID, senderID: $senderID, nickname: $receiverNickname")
 
         if (matchID == -1 || senderID == -1) {
-            Log.e("ChatActivity", "matchID หรือ senderID ไม่ถูกต้อง")
             Toast.makeText(this, "ไม่พบข้อมูลการสนทนา", Toast.LENGTH_LONG).show()
             finish()
             return
@@ -47,12 +57,9 @@ class ChatActivity : AppCompatActivity() {
 
         // ตั้งค่า Toolbar ให้แสดงชื่อเล่นของคู่สนทนา
         setSupportActionBar(binding.toolbar)
-        supportActionBar?.apply {
-            title = receiverNickname // ตั้งค่า title ของ Toolbar เป็น nickname ของคู่สนทนา
-            setDisplayHomeAsUpEnabled(true)
-        }
+        supportActionBar?.title = receiverNickname
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        // กำหนดการทำงานของปุ่มย้อนกลับ
         binding.toolbar.setNavigationOnClickListener {
             finish()
         }
@@ -72,54 +79,134 @@ class ChatActivity : AppCompatActivity() {
                 binding.messageInput.text.clear()
             }
         }
+
+        // กำหนดฟังก์ชันให้กับปุ่ม Block และ Unblock
+        binding.toolbar.findViewById<Button>(R.id.buttonBlockChat).setOnClickListener {
+            blockChat()
+        }
+        binding.toolbar.findViewById<Button>(R.id.buttonUnblockChat).setOnClickListener {
+            unblockChat()
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        handler.post(refreshRunnable) // เริ่มการอัปเดตข้อความเมื่อ Activity กลับมาแสดง
+    }
+
+    override fun onPause() {
+        super.onPause()
+        handler.removeCallbacks(refreshRunnable) // หยุดการอัปเดตข้อความเมื่อ Activity หยุดทำงาน
+    }
+
+    private fun blockChat() {
+        if (isBlocked) {
+            Toast.makeText(this, "คุณไม่สามารถบล็อคได้ เนื่องจากถูกบล็อกจากอีกฝ่าย", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            val url = getString(R.string.root_url) + "/api/block-chat"
+            val requestBody = FormBody.Builder()
+                .add("userID", senderID.toString())
+                .add("matchID", matchID.toString())
+                .add("isBlocked", "1")
+                .build()
+
+            val request = Request.Builder().url(url).post(requestBody).build()
+
+            try {
+                val response = client.newCall(request).execute()
+                if (response.isSuccessful) {
+                    withContext(Dispatchers.Main) {
+                        isBlocked = true
+                        Toast.makeText(this@ChatActivity, "บล็อกแชทเรียบร้อย", Toast.LENGTH_SHORT).show()
+                        binding.toolbar.findViewById<Button>(R.id.buttonBlockChat).isEnabled = false
+                    }
+                } else {
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(this@ChatActivity, "ไม่สามารถบล็อคแชทได้ ลองใหม่อีกครั้ง", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(this@ChatActivity, "เกิดข้อผิดพลาด: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
+    private fun unblockChat() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            val url = getString(R.string.root_url) + "/api/unblock-chat"
+            val requestBody = FormBody.Builder()
+                .add("userID", senderID.toString())
+                .add("matchID", matchID.toString())
+                .build()
+
+            val request = Request.Builder().url(url).post(requestBody).build()
+
+            try {
+                val response = client.newCall(request).execute()
+                if (response.isSuccessful) {
+                    withContext(Dispatchers.Main) {
+                        isBlocked = false
+                        Toast.makeText(this@ChatActivity, "ปลดบล็อคแชทเรียบร้อย", Toast.LENGTH_SHORT).show()
+                        binding.toolbar.findViewById<Button>(R.id.buttonBlockChat).isEnabled = true
+                    }
+                } else {
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(this@ChatActivity, "ไม่สามารถปลดบล็อคแชทได้ ลองใหม่อีกครั้ง", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(this@ChatActivity, "เกิดข้อผิดพลาด: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
     }
 
     private fun fetchChatMessages() {
         lifecycleScope.launch(Dispatchers.IO) {
             val url = getString(R.string.root_url) + "/api/chats/$matchID"
-            Log.d("ChatActivity", "Fetching chat messages from URL: $url")
-
             val request = Request.Builder().url(url).build()
 
             try {
                 val response = client.newCall(request).execute()
                 if (response.isSuccessful) {
                     val responseBody = response.body?.string()
-                    Log.d("ChatActivity", "API response: $responseBody")
-
                     val messages = parseChatMessages(responseBody)
                     withContext(Dispatchers.Main) {
                         if (messages.isEmpty()) {
-                            // ถ้าไม่มีข้อความในแชท ให้แสดงข้อความ "เริ่มแชทกันเลย !!!"
                             binding.emptyChatMessage.visibility = View.VISIBLE
                             binding.recyclerViewChat.visibility = View.GONE
                         } else {
-                            // ถ้ามีข้อความในแชท ให้แสดงข้อความตามปกติ
                             binding.emptyChatMessage.visibility = View.GONE
                             binding.recyclerViewChat.visibility = View.VISIBLE
                             (binding.recyclerViewChat.adapter as ChatAdapter).setMessages(messages)
-                            Log.d("ChatActivity", "Messages set in Adapter: ${messages.size} items")
-
-                            // เลื่อนไปที่ข้อความล่าสุด
                             binding.recyclerViewChat.scrollToPosition(messages.size - 1)
                         }
                     }
                 } else {
                     withContext(Dispatchers.Main) {
-                        Log.e("ChatActivity", "Failed to fetch chat messages: ${response.message}")
                         Toast.makeText(this@ChatActivity, "ไม่สามารถดึงข้อมูลการสนทนาได้", Toast.LENGTH_SHORT).show()
                     }
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
-                    Log.e("ChatActivity", "Error occurred while fetching chat messages: ${e.message}")
-                    Toast.makeText(this@ChatActivity, "Error: ${e.message}", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this@ChatActivity, "เกิดข้อผิดพลาด: ${e.message}", Toast.LENGTH_LONG).show()
                 }
             }
         }
     }
 
     private fun sendMessage(message: String) {
+        if (isBlocked) {
+            Toast.makeText(this, "คุณไม่สามารถส่งข้อความได้ เนื่องจากคุณถูกบล็อก", Toast.LENGTH_SHORT).show()
+            return
+        }
+
         lifecycleScope.launch(Dispatchers.IO) {
             val url = getString(R.string.root_url) + "/api/chats/$matchID"
             val requestBody = FormBody.Builder()
@@ -136,16 +223,14 @@ class ChatActivity : AppCompatActivity() {
                 val response = client.newCall(request).execute()
                 if (!response.isSuccessful) {
                     withContext(Dispatchers.Main) {
-                        val responseBody = response.body?.string()
                         if (response.code == 403) {
-                            // หากถูกบล็อกไม่สามารถส่งข้อความได้
                             Toast.makeText(this@ChatActivity, "คุณถูกบล็อกจากการส่งข้อความในแชทนี้", Toast.LENGTH_SHORT).show()
                         } else {
                             Toast.makeText(this@ChatActivity, "ไม่สามารถส่งข้อความได้", Toast.LENGTH_SHORT).show()
                         }
                     }
                 } else {
-                    fetchChatMessages() // ดึงข้อมูลการสนทนาใหม่และเลื่อนไปที่ข้อความล่าสุด
+                    fetchChatMessages()
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
@@ -159,10 +244,8 @@ class ChatActivity : AppCompatActivity() {
         val messages = mutableListOf<ChatMessage>()
         responseBody?.let {
             try {
-                val jsonObject = JSONObject(it) // แปลงเป็น JSON Object
-                val messagesArray = jsonObject.getJSONArray("messages") // เข้าถึงอาร์เรย์ messages
-
-                Log.d("ChatActivity", "Parsing ${messagesArray.length()} messages from response")
+                val jsonObject = JSONObject(it)
+                val messagesArray = jsonObject.getJSONArray("messages")
 
                 for (i in 0 until messagesArray.length()) {
                     val messageObject = messagesArray.getJSONObject(i)
@@ -173,7 +256,6 @@ class ChatActivity : AppCompatActivity() {
                         messageObject.getString("message"),
                         messageObject.getString("timestamp")
                     )
-                    Log.d("ChatActivity", "Parsed message from ${chatMessage.nickname}: ${chatMessage.message}")
                     messages.add(chatMessage)
                 }
             } catch (e: Exception) {
@@ -184,7 +266,7 @@ class ChatActivity : AppCompatActivity() {
     }
 }
 
-// Data class สำหรับเก็บข้อมูลการสนทนา
+// Data class for storing chat message data
 data class ChatMessage(
     val senderID: Int,
     val nickname: String,
