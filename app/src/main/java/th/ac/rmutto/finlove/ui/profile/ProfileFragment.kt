@@ -1,5 +1,6 @@
 package th.ac.rmutto.finlove.ui.profile
 
+import android.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
 import android.app.DatePickerDialog
 import android.content.Intent
@@ -111,9 +112,12 @@ class ProfileFragment : Fragment() {
         buttonVerify = root.findViewById(R.id.buttonVerify)
         verifyBadge = root.findViewById(R.id.verifyBadge)
 
-        setupSpinners()
+        // Initialize Toolbar Views
+        val toolbar = root.findViewById<Toolbar>(R.id.toolbarProfile)
+        val toolbarTitle = toolbar.findViewById<TextView>(R.id.toolbarTitle)
+        val verifyBadgeNickname = toolbar.findViewById<ImageView>(R.id.verifyBadgeNickname)
 
-        // Hide fields initially
+        setupSpinners()
         hideFieldsForViewingMode()
 
         // Set click listener on imageViewProfile for changing image
@@ -121,7 +125,6 @@ class ProfileFragment : Fragment() {
             selectImage()
         }
 
-        // Setup button listeners
         buttonEditProfile.setOnClickListener {
             toggleEditMode()
         }
@@ -131,7 +134,14 @@ class ProfileFragment : Fragment() {
         }
 
         buttonDeleteAccount.setOnClickListener {
-            deleteUser(requireActivity().intent.getIntExtra("userID", -1))
+            AlertDialog.Builder(requireContext())
+                .setTitle("ยืนยันการลบบัญชี")
+                .setMessage("คุณแน่ใจหรือไม่ว่าต้องการลบบัญชี? การกระทำนี้ไม่สามารถย้อนกลับได้")
+                .setPositiveButton("ยืนยัน") { _, _ ->
+                    deleteUser(requireActivity().intent.getIntExtra("userID", -1))
+                }
+                .setNegativeButton("ยกเลิก", null)
+                .show()
         }
 
         buttonLogout.setOnClickListener {
@@ -154,6 +164,7 @@ class ProfileFragment : Fragment() {
             showDatePicker()
         }
     }
+
 
     private fun setupSpinners() {
         val educationAdapter = ArrayAdapter.createFromResource(
@@ -285,7 +296,10 @@ class ProfileFragment : Fragment() {
 
         val toolbar = requireActivity().findViewById<Toolbar>(R.id.toolbarProfile)
         val toolbarTitle = toolbar.findViewById<TextView>(R.id.toolbarTitle)
+        val verifyBadgeNickname = toolbar.findViewById<ImageView>(R.id.verifyBadgeNickname)
+
         toolbarTitle.text = user.nickname
+        verifyBadgeNickname.visibility = if (user.verify == 1) View.VISIBLE else View.GONE
 
         loadPreferences(user.preferences)
 
@@ -311,6 +325,7 @@ class ProfileFragment : Fragment() {
 
         user.imageFile?.let { loadImage(it, imageViewProfile) }
     }
+
 
     private fun loadImage(url: String, imageView: ImageView) {
         Glide.with(this)
@@ -407,21 +422,30 @@ class ProfileFragment : Fragment() {
         datePickerDialog.show()
     }
 
+    // ProfileFragment.kt
     private fun setEditingEnabled(enabled: Boolean) {
-        textViewUsername.isEnabled = enabled
-        textViewNickname.isEnabled = enabled
-        textViewEmail.isEnabled = enabled
-        textViewFirstName.isEnabled = enabled
-        textViewLastName.isEnabled = enabled
+        textViewUsername.isFocusable = enabled
+        textViewUsername.isFocusableInTouchMode = enabled
+        textViewNickname.isFocusable = enabled
+        textViewNickname.isFocusableInTouchMode = enabled
+        textViewEmail.isFocusable = enabled
+        textViewEmail.isFocusableInTouchMode = enabled
+        textViewFirstName.isFocusable = enabled
+        textViewFirstName.isFocusableInTouchMode = enabled
+        textViewLastName.isFocusable = enabled
+        textViewLastName.isFocusableInTouchMode = enabled
         spinnerGender.isEnabled = enabled
         spinnerInterestGender.isEnabled = enabled
         spinnerEducation.isEnabled = enabled
         spinnerGoal.isEnabled = enabled
-        textViewHeight.isEnabled = enabled
-        textViewHome.isEnabled = enabled
+        textViewHeight.isFocusable = enabled
+        textViewHeight.isFocusableInTouchMode = enabled
+        textViewHome.isFocusable = enabled
+        textViewHome.isFocusableInTouchMode = enabled
         buttonSelectDateProfile.isEnabled = enabled
         buttonSaveProfile.isEnabled = enabled
     }
+
 
     private fun showAllFields() {
         spinnerInterestGender.visibility = View.VISIBLE
