@@ -20,7 +20,6 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.asRequestBody
 import org.json.JSONObject
 import th.ac.rmutto.finlove.databinding.ActivityAddphotoBinding
-import th.ac.rmutto.finlove.ui.profile.ProfileFragment
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -29,7 +28,6 @@ import java.util.concurrent.TimeUnit
 class AddphotoActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityAddphotoBinding
-    private val PICK_IMAGE = 1
     private val CAMERA_REQUEST = 2
     private val client = OkHttpClient.Builder().connectTimeout(10, TimeUnit.SECONDS).build()
     private var userID: Int = -1  // รับ userID ที่ส่งมาจาก ProfileFragment
@@ -51,8 +49,9 @@ class AddphotoActivity : AppCompatActivity() {
 
         checkPermissions()
 
+        // เมื่อคลิกที่ปุ่ม imageView จะเรียกกล้องโดยตรง
         binding.imageView.setOnClickListener {
-            showImageChooser()
+            openCamera()
         }
 
         binding.confirmButton.setOnClickListener {
@@ -61,25 +60,10 @@ class AddphotoActivity : AppCompatActivity() {
         }
     }
 
-    private fun showImageChooser() {
-        val options = arrayOf<CharSequence>("Take Photo", "Choose from Gallery", "Cancel")
-        val builder = android.app.AlertDialog.Builder(this)
-        builder.setTitle("Select Option")
-        builder.setItems(options) { dialog, item ->
-            when {
-                options[item] == "Take Photo" -> {
-                    val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-                    startActivityForResult(cameraIntent, CAMERA_REQUEST)
-                }
-                options[item] == "Choose from Gallery" -> {
-                    val galleryIntent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-                    galleryIntent.type = "image/*"
-                    startActivityForResult(galleryIntent, PICK_IMAGE)
-                }
-                options[item] == "Cancel" -> dialog.dismiss()
-            }
-        }
-        builder.show()
+    // ฟังก์ชันเพื่อเปิดกล้องโดยตรง
+    private fun openCamera() {
+        val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        startActivityForResult(cameraIntent, CAMERA_REQUEST)
     }
 
     private fun checkPermissions() {
@@ -96,29 +80,15 @@ class AddphotoActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode == RESULT_OK) {
-            when (requestCode) {
-                PICK_IMAGE -> {
-                    val selectedImage: Uri? = data?.data
-                    selectedImage?.let {
-                        binding.imageView.setImageURI(it)
-                        binding.textViewFile.text = "รายละเอียดชื่อไฟล์: " + it.lastPathSegment
-                        binding.textViewFile.visibility = View.VISIBLE
-                        binding.textView.visibility = View.GONE
-                        onNext(it)
-                    }
-                }
-                CAMERA_REQUEST -> {
-                    val photo: Bitmap = data?.extras?.get("data") as Bitmap
-                    binding.imageViewshow.setImageBitmap(photo)
-                    binding.imageView.visibility = View.GONE
-                    binding.textViewFile.text = "Captured Image"
-                    binding.textViewFile.visibility = View.VISIBLE
-                    binding.textView.visibility = View.GONE
-                    val placeholderUri = saveImageToExternalStorage(photo)
-                    onNext(placeholderUri)
-                }
-            }
+        if (resultCode == RESULT_OK && requestCode == CAMERA_REQUEST) {
+            val photo: Bitmap = data?.extras?.get("data") as Bitmap
+            binding.imageViewshow.setImageBitmap(photo)
+            binding.imageView.visibility = View.GONE
+            binding.textViewFile.text = "Captured Image"
+            binding.textViewFile.visibility = View.VISIBLE
+            binding.textView.visibility = View.GONE
+            val placeholderUri = saveImageToExternalStorage(photo)
+            onNext(placeholderUri)
         }
     }
 
@@ -137,9 +107,8 @@ class AddphotoActivity : AppCompatActivity() {
     }
 
     private fun sendImageForVerification(imageUri: Uri) {
-        val url = "http://192.168.1.53:5000/verify"
+        val url = getString(R.string.root_url3) + "/predict"  // ใช้ URL จาก resource string
 
-        // แปลง Uri ของไฟล์เป็น File ที่เข้าถึงได้
         val imagePath = imageUri.path ?: ""
         val imageFile = File(imagePath)
 
@@ -150,7 +119,7 @@ class AddphotoActivity : AppCompatActivity() {
 
         val requestBody = MultipartBody.Builder().setType(MultipartBody.FORM)
             .addFormDataPart("image", imageFile.name, imageFile.asRequestBody("image/*".toMediaTypeOrNull()))
-            .addFormDataPart("userID", userID.toString())  // ส่ง userID ไปยังเซิร์ฟเวอร์
+            .addFormDataPart("UserID", userID.toString())  // ใช้ "UserID" ให้ตรงกับฝั่ง server
             .build()
 
         val request = Request.Builder().url(url).post(requestBody).build()
@@ -158,28 +127,33 @@ class AddphotoActivity : AppCompatActivity() {
         client.newCall(request).enqueue(object : Callback {
             override fun onResponse(call: Call, response: Response) {
                 if (response.isSuccessful) {
-                    val isVerified = JSONObject(response.body?.string()).getBoolean("is_verified")
+                    val jsonResponse = JSONObject(response.body?.string())
+                    val isHuman = jsonResponse.getBoolean("is_human")
+                    val confidenceScore = jsonResponse.getDouble("confidence_score")
+
                     runOnUiThread {
                         Toast.makeText(
                             this@AddphotoActivity,
-                            if (isVerified) "Verify สำเร็จ" else "Verify ไม่สำเร็จ",
+                            if (isHuman) "Verification successful, human detected." else "Verification failed, not human.",
                             Toast.LENGTH_SHORT
                         ).show()
 
-                        // แทนที่ด้วยการกลับไปที่ ProfileFragment
                         val intent = Intent(this@AddphotoActivity, MainActivity::class.java)
                         intent.putExtra("userID", userID)
-                        intent.putExtra("navigateToProfile", true)  // ส่งข้อมูลไปให้เปิด ProfileFragment
+                        intent.putExtra("navigateToProfile", true)
                         startActivity(intent)
-                        finish() // ปิด Activity นี้หลังจากเริ่ม Intent ใหม่
+                        finish()
+                    }
+                } else {
+                    runOnUiThread {
+                        Toast.makeText(this@AddphotoActivity, "Failed to verify image", Toast.LENGTH_SHORT).show()
                     }
                 }
             }
 
-
             override fun onFailure(call: Call, e: IOException) {
                 runOnUiThread {
-                    Toast.makeText(this@AddphotoActivity, "Failed to verify image", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@AddphotoActivity, "Network request failed", Toast.LENGTH_SHORT).show()
                 }
             }
         })

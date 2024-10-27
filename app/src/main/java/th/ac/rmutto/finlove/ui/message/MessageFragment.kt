@@ -9,11 +9,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -40,12 +41,14 @@ class MessageFragment : Fragment() {
     private val handler = Handler()
     private val refreshInterval = 2000L // Refresh every 2 seconds
 
+    private lateinit var adapter: MatchedUserAdapter
+
     private val refreshRunnable = object : Runnable {
         override fun run() {
             fetchMatchedUsers { fetchedUsers ->
                 if (fetchedUsers.isNotEmpty()) {
                     matchedUsers = fetchedUsers
-                    displayUsers() // Update UI with the latest data
+                    adapter.updateUsers(fetchedUsers) // Update the adapter with the latest data
                 }
             }
             handler.postDelayed(this, refreshInterval) // Schedule the next refresh
@@ -66,7 +69,7 @@ class MessageFragment : Fragment() {
             fetchMatchedUsers { fetchedUsers ->
                 if (fetchedUsers.isNotEmpty()) {
                     matchedUsers = fetchedUsers
-                    displayUsers() // Display matched users
+                    setupRecyclerView() // Display matched users using RecyclerView
                 } else {
                     Toast.makeText(requireContext(), "ไม่พบผู้ใช้ที่จับคู่กัน", Toast.LENGTH_SHORT).show()
                 }
@@ -78,6 +81,32 @@ class MessageFragment : Fragment() {
         return root
     }
 
+    private fun setupRecyclerView() {
+        adapter = MatchedUserAdapter(
+            matchedUsers,
+            userID,
+            onChatClick = { user ->
+                val intent = Intent(requireContext(), ChatActivity::class.java).apply {
+                    putExtra("matchID", user.matchID)
+                    putExtra("senderID", userID)
+                    putExtra("nickname", user.nickname)
+                }
+                startActivity(intent)
+            },
+            onProfileClick = { user ->
+                val intent = Intent(requireContext(), OtherProfileActivity::class.java).apply {
+                    putExtra("userID", user.userID)
+                }
+                startActivity(intent)
+            },
+            onDeleteChatClick = { user ->
+                deleteChat(user.matchID)
+            }
+        )
+        binding.recyclerViewUserList.layoutManager = LinearLayoutManager(requireContext())
+        binding.recyclerViewUserList.adapter = adapter
+    }
+
     override fun onResume() {
         super.onResume()
         handler.post(refreshRunnable) // Start data refresh
@@ -86,49 +115,6 @@ class MessageFragment : Fragment() {
     override fun onPause() {
         super.onPause()
         handler.removeCallbacks(refreshRunnable) // Stop data refresh
-    }
-
-    private fun displayUsers() {
-        val userListLayout: LinearLayout = binding.userListLayout
-        userListLayout.removeAllViews()
-
-        matchedUsers.forEach { user ->
-            val userView = LayoutInflater.from(requireContext()).inflate(R.layout.item_message, userListLayout, false)
-
-            val nickname: TextView = userView.findViewById(R.id.textNickname)
-            val profileImage: ImageView = userView.findViewById(R.id.imageProfile)
-            val lastMessage: TextView = userView.findViewById(R.id.lastMessage)
-            val lastInteraction: TextView = userView.findViewById(R.id.textLastInteraction)
-            val buttonDeleteChat: Button = userView.findViewById(R.id.buttonDeleteChat)
-
-            nickname.text = user.nickname
-            lastMessage.text = user.lastMessage ?: "ไม่มีข้อความล่าสุด"
-            lastInteraction.text = formatTime(user.lastInteraction)
-            Glide.with(requireContext()).load(user.profilePicture).into(profileImage)
-
-            userView.setOnClickListener {
-                val intent = Intent(requireContext(), ChatActivity::class.java).apply {
-                    putExtra("matchID", user.matchID)
-                    putExtra("senderID", userID)
-                    putExtra("nickname", user.nickname)
-                }
-                startActivity(intent)
-            }
-
-            profileImage.setOnClickListener {
-                val intent = Intent(requireContext(), OtherProfileActivity::class.java).apply {
-                    putExtra("userID", user.userID)
-                }
-                startActivity(intent)
-            }
-
-            // Handle delete chat button
-            buttonDeleteChat.setOnClickListener {
-                deleteChat(user.matchID)
-            }
-
-            userListLayout.addView(userView)
-        }
     }
 
     private fun deleteChat(matchID: Int) {
@@ -146,7 +132,7 @@ class MessageFragment : Fragment() {
                 if (response.isSuccessful) {
                     withContext(Dispatchers.Main) {
                         Toast.makeText(requireContext(), "ลบแชทเรียบร้อย", Toast.LENGTH_SHORT).show()
-                        fetchMatchedUsers { displayUsers() }
+                        fetchMatchedUsers { adapter.updateUsers(it) }
                     }
                 } else {
                     withContext(Dispatchers.Main) {
@@ -158,21 +144,6 @@ class MessageFragment : Fragment() {
                     Toast.makeText(requireContext(), "เกิดข้อผิดพลาด: ${e.message}", Toast.LENGTH_SHORT).show()
                 }
             }
-        }
-    }
-
-    private fun formatTime(timestamp: String?): String {
-        return if (timestamp != null) {
-            try {
-                val inputFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSSSS", Locale.getDefault())
-                val outputFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
-                val date = inputFormat.parse(timestamp)
-                outputFormat.format(date)
-            } catch (e: Exception) {
-                timestamp
-            }
-        } else {
-            ""
         }
     }
 
@@ -232,7 +203,62 @@ class MessageFragment : Fragment() {
     }
 }
 
-// Data class to store matched user information
+class MatchedUserAdapter(
+    private var users: List<MatchedUser>,
+    private val userID: Int,
+    private val onChatClick: (MatchedUser) -> Unit,
+    private val onProfileClick: (MatchedUser) -> Unit,
+    private val onDeleteChatClick: (MatchedUser) -> Unit
+) : RecyclerView.Adapter<MatchedUserAdapter.ViewHolder>() {
+
+    inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val nickname: TextView = view.findViewById(R.id.textNickname)
+        val profileImage: ImageView = view.findViewById(R.id.imageProfile)
+        val lastMessage: TextView = view.findViewById(R.id.lastMessage)
+        val lastInteraction: TextView = view.findViewById(R.id.textLastInteraction)
+        val buttonDeleteChat: Button = view.findViewById(R.id.buttonDeleteChat)
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_message, parent, false)
+        return ViewHolder(view)
+    }
+
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        val user = users[position]
+        holder.nickname.text = user.nickname
+        holder.lastMessage.text = user.lastMessage ?: "ไม่มีข้อความล่าสุด"
+        holder.lastInteraction.text = formatTime(user.lastInteraction)
+        Glide.with(holder.profileImage.context).load(user.profilePicture).into(holder.profileImage)
+
+        holder.itemView.setOnClickListener { onChatClick(user) }
+        holder.profileImage.setOnClickListener { onProfileClick(user) }
+        holder.buttonDeleteChat.setOnClickListener { onDeleteChatClick(user) }
+    }
+
+    override fun getItemCount() = users.size
+
+    private fun formatTime(timestamp: String?): String {
+        return if (timestamp != null) {
+            try {
+                val inputFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSSSS", Locale.getDefault())
+                val outputFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
+                val date = inputFormat.parse(timestamp)
+                outputFormat.format(date)
+            } catch (e: Exception) {
+                timestamp
+            }
+        } else {
+            ""
+        }
+    }
+
+    fun updateUsers(newUsers: List<MatchedUser>) {
+        users = newUsers
+        notifyDataSetChanged()
+    }
+}
+
 data class MatchedUser(
     val userID: Int,
     val nickname: String,
