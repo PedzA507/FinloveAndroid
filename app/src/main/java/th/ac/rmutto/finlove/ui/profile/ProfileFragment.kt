@@ -203,17 +203,19 @@ class ProfileFragment : Fragment() {
     private fun toggleEditMode() {
         isEditing = !isEditing
         setEditingEnabled(isEditing)
+
         if (isEditing) {
             buttonSaveProfile.visibility = View.VISIBLE
             buttonEditPreferences.visibility = View.VISIBLE
 
             currentUser = originalUser.copy()
-            showAllFields()
+            showAllFields() // แสดงฟิลด์ทั้งหมดเมื่อเข้าสู่โหมดแก้ไข
         } else {
             restoreOriginalUserInfo()
-            hideFieldsForViewingMode()
+            hideFieldsForViewingMode() // ซ่อนฟิลด์ที่ไม่จำเป็นเมื่อออกจากโหมดแก้ไข
         }
     }
+
 
     private fun selectImage() {
         val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
@@ -423,6 +425,7 @@ class ProfileFragment : Fragment() {
     }
 
     // ProfileFragment.kt
+    // ProfileFragment.kt
     private fun setEditingEnabled(enabled: Boolean) {
         textViewUsername.isFocusable = enabled
         textViewUsername.isFocusableInTouchMode = enabled
@@ -434,17 +437,18 @@ class ProfileFragment : Fragment() {
         textViewFirstName.isFocusableInTouchMode = enabled
         textViewLastName.isFocusable = enabled
         textViewLastName.isFocusableInTouchMode = enabled
-        spinnerGender.isEnabled = enabled
-        spinnerInterestGender.isEnabled = enabled
-        spinnerEducation.isEnabled = enabled
-        spinnerGoal.isEnabled = enabled
         textViewHeight.isFocusable = enabled
         textViewHeight.isFocusableInTouchMode = enabled
         textViewHome.isFocusable = enabled
         textViewHome.isFocusableInTouchMode = enabled
+        spinnerGender.isEnabled = enabled
+        spinnerInterestGender.isEnabled = enabled
+        spinnerEducation.isEnabled = enabled
+        spinnerGoal.isEnabled = enabled
         buttonSelectDateProfile.isEnabled = enabled
         buttonSaveProfile.isEnabled = enabled
     }
+
 
 
     private fun showAllFields() {
