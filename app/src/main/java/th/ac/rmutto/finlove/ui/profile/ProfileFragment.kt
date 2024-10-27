@@ -207,6 +207,7 @@ class ProfileFragment : Fragment() {
         if (isEditing) {
             buttonSaveProfile.visibility = View.VISIBLE
             buttonEditPreferences.visibility = View.VISIBLE
+            buttonDeleteAccount.visibility = View.VISIBLE
 
             currentUser = originalUser.copy()
             showAllFields() // แสดงฟิลด์ทั้งหมดเมื่อเข้าสู่โหมดแก้ไข
@@ -415,14 +416,25 @@ class ProfileFragment : Fragment() {
         val month = calendar.get(Calendar.MONTH)
         val day = calendar.get(Calendar.DAY_OF_MONTH)
 
-        val datePickerDialog = DatePickerDialog(requireContext(), { _, selectedYear, selectedMonth, selectedDay ->
-            selectedDateOfBirth = "$selectedYear-${String.format("%02d", selectedMonth + 1)}-${String.format("%02d", selectedDay)}"
-            buttonSelectDateProfile.text = selectedDateOfBirth
-        }, year, month, day)
+        // Calculate the maximum date as 18 years before today
+        calendar.add(Calendar.YEAR, -18)
+        val eighteenYearsAgo = calendar.timeInMillis
 
-        datePickerDialog.datePicker.maxDate = System.currentTimeMillis()
+        val datePickerDialog = DatePickerDialog(
+            requireContext(),
+            { _, selectedYear, selectedMonth, selectedDay ->
+                selectedDateOfBirth = "$selectedYear-${String.format("%02d", selectedMonth + 1)}-${String.format("%02d", selectedDay)}"
+                buttonSelectDateProfile.text = selectedDateOfBirth
+            },
+            year,
+            month,
+            day
+        )
+
+        datePickerDialog.datePicker.maxDate = eighteenYearsAgo
         datePickerDialog.show()
     }
+
 
     // ProfileFragment.kt
     // ProfileFragment.kt
@@ -447,6 +459,7 @@ class ProfileFragment : Fragment() {
         spinnerGoal.isEnabled = enabled
         buttonSelectDateProfile.isEnabled = enabled
         buttonSaveProfile.isEnabled = enabled
+        buttonDeleteAccount.isEnabled = enabled
     }
 
 
@@ -471,7 +484,7 @@ class ProfileFragment : Fragment() {
         spinnerGoal.visibility = View.GONE
         spinnerEducation.visibility = View.GONE
         spinnerInterestGender.visibility = View.GONE
-
+        buttonDeleteAccount.visibility = View.GONE
         buttonSaveProfile.visibility = View.GONE
         buttonEditPreferences.visibility = View.GONE
     }
