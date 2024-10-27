@@ -99,6 +99,9 @@ class ChatActivity : AppCompatActivity() {
                             binding.recyclerViewChat.visibility = View.VISIBLE
                             (binding.recyclerViewChat.adapter as ChatAdapter).setMessages(messages)
                             Log.d("ChatActivity", "Messages set in Adapter: ${messages.size} items")
+
+                            // เลื่อนไปที่ข้อความล่าสุด
+                            binding.recyclerViewChat.scrollToPosition(messages.size - 1)
                         }
                     }
                 } else {
@@ -142,7 +145,7 @@ class ChatActivity : AppCompatActivity() {
                         }
                     }
                 } else {
-                    fetchChatMessages() // ดึงข้อมูลการสนทนาใหม่
+                    fetchChatMessages() // ดึงข้อมูลการสนทนาใหม่และเลื่อนไปที่ข้อความล่าสุด
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
@@ -151,8 +154,6 @@ class ChatActivity : AppCompatActivity() {
             }
         }
     }
-
-
 
     private fun parseChatMessages(responseBody: String?): List<ChatMessage> {
         val messages = mutableListOf<ChatMessage>()
