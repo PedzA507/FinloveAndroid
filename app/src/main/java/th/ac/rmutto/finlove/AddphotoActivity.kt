@@ -107,7 +107,7 @@ class AddphotoActivity : AppCompatActivity() {
     }
 
     private fun sendImageForVerification(imageUri: Uri) {
-        val url = getString(R.string.root_url3) + "/predict"  // ใช้ URL จาก resource string
+        val url = getString(R.string.root_url3) + "/ai/predict"  // ใช้ URL จาก resource string
 
         val imagePath = imageUri.path ?: ""
         val imageFile = File(imagePath)

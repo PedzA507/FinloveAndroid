@@ -275,7 +275,7 @@ class HomeFragment : Fragment() {
     // ดึงข้อมูลผู้ใช้ที่แนะนำ
     private fun fetchRecommendedUsers(callback: (List<User>) -> Unit) {
         lifecycleScope.launch(Dispatchers.IO) {
-            val url = getString(R.string.root_url2) + "/api/recommend/$userID"
+            val url = getString(R.string.root_url2) + "/ai/recommend/$userID"
             val request = Request.Builder().url(url).build()
 
             try {
