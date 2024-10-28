@@ -65,7 +65,7 @@ class ChangePreferenceActivity : AppCompatActivity() {
 
         // Save button click listener
         buttonSave.setOnClickListener {
-            if (selectedPreferences.isEmpty()) {
+            if (selectedPreferences.size < 1) {
                 Toast.makeText(this, "กรุณาเลือกอย่างน้อยหนึ่งตัวเลือก", Toast.LENGTH_LONG).show()
                 return@setOnClickListener
             }
@@ -153,11 +153,21 @@ class ChangePreferenceActivity : AppCompatActivity() {
             }
 
             if (button.isSelected) {
-                button.isSelected = false
-                selectedPreferences.remove(preferenceID) // เอา PreferenceID ออกจาก List
+                // เช็คว่าจำนวนที่เหลือจะเป็น 0 หรือไม่
+                if (selectedPreferences.size <= 1) {
+                    Toast.makeText(this, "กรุณาเลือกอย่างน้อยหนึ่งตัวเลือก", Toast.LENGTH_LONG).show()
+                } else {
+                    button.isSelected = false
+                    selectedPreferences.remove(preferenceID) // เอา PreferenceID ออกจาก List
+                }
             } else {
-                button.isSelected = true
-                selectedPreferences.add(preferenceID) // เพิ่ม PreferenceID ลงใน List
+                // เช็คว่ามีการเลือกครบ 3 อย่างหรือยัง
+                if (selectedPreferences.size >= 3) {
+                    Toast.makeText(this, "คุณสามารถเลือกได้สูงสุด 3 ตัวเลือก", Toast.LENGTH_LONG).show()
+                } else {
+                    button.isSelected = true
+                    selectedPreferences.add(preferenceID) // เพิ่ม PreferenceID ลงใน List
+                }
             }
         }
     }
