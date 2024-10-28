@@ -134,7 +134,7 @@ class AddphotoActivity : AppCompatActivity() {
                     runOnUiThread {
                         Toast.makeText(
                             this@AddphotoActivity,
-                            if (isHuman) "Verification successful, human detected." else "Verification failed, not human.",
+                            if (isHuman) "ยืนยันตัวตนเรียบร้อย" else "ยืนยันตัวตนไม่สำเร็จกรุณาลองใหม่อีกครั้ง",
                             Toast.LENGTH_SHORT
                         ).show()
 
@@ -146,7 +146,7 @@ class AddphotoActivity : AppCompatActivity() {
                     }
                 } else {
                     runOnUiThread {
-                        Toast.makeText(this@AddphotoActivity, "Failed to verify image", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@AddphotoActivity, "ยืนยันตัวตนไม่สำเร็จกรุณาลองใหม่อีกครั้ง", Toast.LENGTH_SHORT).show()
                     }
                 }
             }

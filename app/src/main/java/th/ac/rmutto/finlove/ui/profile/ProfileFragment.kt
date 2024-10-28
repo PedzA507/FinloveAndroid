@@ -273,6 +273,7 @@ class ProfileFragment : Fragment() {
                         originalUser = user
                         updateUserFields(user)
                         verifyBadge.visibility = if (user.verify == 1) View.VISIBLE else View.GONE
+                        buttonVerify.visibility = if (user.verify == 1) View.GONE else View.VISIBLE
                     }
                 } else {
                     withContext(Dispatchers.Main) {
