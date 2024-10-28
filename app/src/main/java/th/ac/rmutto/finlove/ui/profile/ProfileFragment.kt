@@ -436,9 +436,6 @@ class ProfileFragment : Fragment() {
         datePickerDialog.show()
     }
 
-
-    // ProfileFragment.kt
-    // ProfileFragment.kt
     private fun setEditingEnabled(enabled: Boolean) {
         textViewUsername.isFocusable = enabled
         textViewUsername.isFocusableInTouchMode = enabled
@@ -462,8 +459,6 @@ class ProfileFragment : Fragment() {
         buttonSaveProfile.isEnabled = enabled
         buttonDeleteAccount.isEnabled = enabled
     }
-
-
 
     private fun showAllFields() {
         spinnerInterestGender.visibility = View.VISIBLE
