@@ -25,7 +25,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="15dp"
-        android:layout_marginBottom="70dp"
+        android:layout_marginBottom="10dp"
         android:orientation="horizontal"
         android:padding="8dp"
         app:layout_constraintBottom_toBottomOf="@+id/imageProfile"
@@ -38,27 +38,18 @@
             android:layout_marginEnd="4dp"
             android:text="Nana_na"
             android:textColor="@android:color/white"
-            android:textSize="24sp" />
+            android:textSize="34sp" />
 
         <ImageView
             android:id="@+id/imageVerified"
             android:layout_width="24dp"
             android:layout_height="24dp"
+            android:layout_marginTop="15dp"
             android:src="@drawable/verify"
             android:visibility="visible" />
     </LinearLayout>
 
     <!-- ข้อความ "ความชอบ" ที่อยู่ใต้ชื่อผู้ใช้ -->
-    <TextView
-        android:id="@+id/textPreferences"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:text="ความชอบ:"
-        android:textColor="@android:color/white"
-        android:textSize="18sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout2" />
 
     <!-- กลุ่มปุ่ม Like และ Dislike ที่ติดกันแบบไม่มีช่องว่าง -->
     <LinearLayout
