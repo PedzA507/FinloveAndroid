@@ -346,7 +346,8 @@ class ProfileFragment : Fragment() {
                 val selectedEducation = spinnerEducation.selectedItem.toString()
                 val selectedGoal = spinnerGoal.selectedItem.toString()
 
-                val formattedDateBirth = selectedDateOfBirth?.substring(0, 10)
+                val formattedDateBirth = selectedDateOfBirth ?: currentUser.dateBirth
+
 
                 val requestBuilder = MultipartBody.Builder().setType(MultipartBody.FORM)
                     .addFormDataPart("username", textViewUsername.text.toString())
