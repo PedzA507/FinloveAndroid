@@ -89,6 +89,7 @@ class ProfileFragment : Fragment() {
     }
 
     private fun initializeViews(root: View) {
+        // การกำหนดค่าเริ่มต้นสำหรับ Views ต่าง ๆ
         textViewUsername = root.findViewById(R.id.textViewUsername)
         textViewNickname = root.findViewById(R.id.textViewNickname)
         textViewEmail = root.findViewById(R.id.textViewEmail)
@@ -120,19 +121,19 @@ class ProfileFragment : Fragment() {
         setupSpinners()
         hideFieldsForViewingMode()
 
-        // Set click listener on imageViewProfile for changing image
+        // ตั้งค่าให้ฟิลด์ต่าง ๆ ไม่สามารถแก้ไขได้เมื่อเปิดหน้าครั้งแรก
+        setEditingEnabled(false)
+
+        // ตั้งค่า Click Listener สำหรับรูปโปรไฟล์และปุ่มอื่นๆ
         imageViewProfile.setOnClickListener {
             selectImage()
         }
-
         buttonEditProfile.setOnClickListener {
             toggleEditMode()
         }
-
         buttonSaveProfile.setOnClickListener {
             saveUserInfo(requireActivity().intent.getIntExtra("userID", -1))
         }
-
         buttonDeleteAccount.setOnClickListener {
             AlertDialog.Builder(requireContext())
                 .setTitle("ยืนยันการลบบัญชี")
@@ -143,23 +144,19 @@ class ProfileFragment : Fragment() {
                 .setNegativeButton("ยกเลิก", null)
                 .show()
         }
-
         buttonLogout.setOnClickListener {
             logoutUser(requireActivity().intent.getIntExtra("userID", -1))
         }
-
         buttonEditPreferences.setOnClickListener {
             val intent = Intent(requireContext(), ChangePreferenceActivity::class.java)
             intent.putExtra("userID", requireActivity().intent.getIntExtra("userID", -1))
             startActivityForResult(intent, REQUEST_CODE_CHANGE_PREFERENCES)
         }
-
         buttonVerify.setOnClickListener {
             val intent = Intent(requireContext(), AddphotoActivity::class.java)
             intent.putExtra("userID", requireActivity().intent.getIntExtra("userID", -1))
             startActivity(intent)
         }
-
         buttonSelectDateProfile.setOnClickListener {
             showDatePicker()
         }
