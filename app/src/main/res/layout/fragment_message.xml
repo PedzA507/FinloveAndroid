@@ -10,11 +10,26 @@
     <!-- RecyclerView สำหรับแสดงรายชื่อผู้ใช้ที่จับคู่ -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewUserList"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        android:layout_width="409dp"
+        android:layout_height="553dp"
+        android:padding="16dp"
+        app:layout_constraintBottom_toTopOf="@id/buttonRestoreAllChats"
         app:layout_constraintEnd_toEndOf="parent"
-        android:padding="16dp" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- ปุ่มเรียกคืนแชททั้งหมด -->
+    <Button
+        android:id="@+id/buttonRestoreAllChats"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:text="เรียกคืนแชททั้งหมด"
+        android:background="@drawable/button"
+        android:textColor="@color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/recyclerViewUserList" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

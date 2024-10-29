@@ -79,6 +79,11 @@ class MessageFragment : Fragment() {
             Toast.makeText(requireContext(), "UserID ไม่ถูกพบ", Toast.LENGTH_SHORT).show()
         }
 
+        // Setup restore all chats button
+        binding.buttonRestoreAllChats.setOnClickListener {
+            restoreAllChats(userID)
+        }
+
         return root
     }
 
@@ -138,6 +143,35 @@ class MessageFragment : Fragment() {
                 } else {
                     withContext(Dispatchers.Main) {
                         Toast.makeText(requireContext(), "ไม่สามารถลบแชทได้ ลองใหม่อีกครั้ง", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            } catch (e: IOException) {
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(requireContext(), "เกิดข้อผิดพลาด: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
+    private fun restoreAllChats(userID: Int) {
+        lifecycleScope.launch(Dispatchers.IO) {
+            val url = getString(R.string.root_url) + "/api/restore-all-chats"
+            val requestBody = FormBody.Builder()
+                .add("userID", userID.toString())
+                .build()
+
+            val request = Request.Builder().url(url).post(requestBody).build()
+
+            try {
+                val response = client.newCall(request).execute()
+                if (response.isSuccessful) {
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(requireContext(), "เรียกคืนแชททั้งหมดเรียบร้อย", Toast.LENGTH_SHORT).show()
+                        fetchMatchedUsers { adapter.updateUsers(it) } // อัปเดตรายชื่อผู้ใช้ที่แสดง
+                    }
+                } else {
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(requireContext(), "ไม่สามารถเรียกคืนแชททั้งหมดได้ ลองใหม่อีกครั้ง", Toast.LENGTH_SHORT).show()
                     }
                 }
             } catch (e: IOException) {
@@ -250,7 +284,6 @@ class MatchedUserAdapter(
                 .show()
         }
     }
-
 
     override fun getItemCount() = users.size
 
