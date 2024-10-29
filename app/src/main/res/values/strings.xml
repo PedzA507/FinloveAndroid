@@ -3,9 +3,9 @@
     <string name="title_Main">Main</string>
     <string name="title_Message">Message</string>
     <string name="title_Profile">Profile</string>
-    <string name="root_url">http://10.13.1.241:4000</string>
-    <string name="root_url3">http://10.13.1.241:5000</string>
-    <string name="root_url2">http://10.13.1.241:6000</string>
+    <string name="root_url">https://fin-love.com</string>
+    <string name="root_url3">https://fin-love.com</string>
+    <string name="root_url2">https://fin-love.com</string>
     <string-array name="education_levels">
         <item>มัธยมศึกษา</item>
         <item>ปริญญาตรี</item>
