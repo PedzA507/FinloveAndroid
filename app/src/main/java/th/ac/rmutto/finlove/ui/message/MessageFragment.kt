@@ -1,5 +1,6 @@
 package th.ac.rmutto.finlove.ui.message
 
+import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
@@ -233,8 +234,23 @@ class MatchedUserAdapter(
 
         holder.itemView.setOnClickListener { onChatClick(user) }
         holder.profileImage.setOnClickListener { onProfileClick(user) }
-        holder.buttonDeleteChat.setOnClickListener { onDeleteChatClick(user) }
+
+        holder.buttonDeleteChat.setOnClickListener {
+            // Show confirmation dialog
+            AlertDialog.Builder(holder.itemView.context)
+                .setTitle("ยืนยันการลบแชท")
+                .setMessage("คุณแน่ใจหรือไม่ว่าต้องการลบแชทนี้? การลบจะทำให้แชทไม่แสดงผล")
+                .setPositiveButton("ลบ") { dialog, _ ->
+                    onDeleteChatClick(user)
+                    dialog.dismiss()
+                }
+                .setNegativeButton("ยกเลิก") { dialog, _ ->
+                    dialog.dismiss()
+                }
+                .show()
+        }
     }
+
 
     override fun getItemCount() = users.size
 

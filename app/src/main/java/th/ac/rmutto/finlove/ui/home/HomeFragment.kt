@@ -231,11 +231,10 @@ class HomeFragment : Fragment() {
         })
     }
 
-    // ฟังก์ชันแสดง Popup ตรงกลางหน้าจอเมื่อ Match กัน
     private fun showMatchPopup() {
         val builder = AlertDialog.Builder(requireContext())
         builder.setTitle("Match!")
-        builder.setMessage("คุณ Match กับผู้ใช้นี้แล้ว!")
+        builder.setMessage("คุณ Match กับผู้ใช้นี้แล้ว!\nแชทกับผู้ใช้นี้ได้แล้ว!")
         builder.setPositiveButton("ตกลง") { dialog, _ ->
             dialog.dismiss()
             nextUser()
@@ -244,6 +243,7 @@ class HomeFragment : Fragment() {
         val alertDialog = builder.create()
         alertDialog.show()
     }
+
 
     // ฟังก์ชันสำหรับการกด "Dislike"
     private fun dislikeUser(dislikedID: Int) {
