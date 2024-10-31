@@ -3,7 +3,8 @@
     <domain-config cleartextTrafficPermitted="true">
         <domain includeSubdomains="true">localhost</domain>
         <domain includeSubdomains="true">fin-love.com</domain>
-<!--        <domain includeSubdomains="true">10.10.50.62</domain>  ใช้ IP ที่ต้องการ -->
+<!--        สำหรับ manual-->
+<!--        <domain includeSubdomains="true">192.168.62.1</domain>-->
     </domain-config>
     <base-config cleartextTrafficPermitted="true" />
 </network-security-config>
