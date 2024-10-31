@@ -125,7 +125,7 @@ class MessageFragment : Fragment() {
 
     private fun deleteChat(matchID: Int) {
         lifecycleScope.launch(Dispatchers.IO) {
-            val url = getString(R.string.root_url) + "/api/delete-chat"
+            val url = getString(R.string.root_url) + "/api_v2/delete-chat"
             val requestBody = FormBody.Builder()
                 .add("userID", userID.toString())
                 .add("matchID", matchID.toString())
@@ -155,7 +155,7 @@ class MessageFragment : Fragment() {
 
     private fun restoreAllChats(userID: Int) {
         lifecycleScope.launch(Dispatchers.IO) {
-            val url = getString(R.string.root_url) + "/api/restore-all-chats"
+            val url = getString(R.string.root_url) + "/api_v2/restore-all-chats"
             val requestBody = FormBody.Builder()
                 .add("userID", userID.toString())
                 .build()
@@ -184,7 +184,7 @@ class MessageFragment : Fragment() {
 
     private fun fetchMatchedUsers(callback: (List<MatchedUser>) -> Unit) {
         lifecycleScope.launch(Dispatchers.IO) {
-            val url = getString(R.string.root_url) + "/api/matches/$userID"
+            val url = getString(R.string.root_url) + "/api_v2/matches/$userID"
             Log.d("API Request", "Fetching matched users from URL: $url")
             val request = Request.Builder().url(url).build()
 

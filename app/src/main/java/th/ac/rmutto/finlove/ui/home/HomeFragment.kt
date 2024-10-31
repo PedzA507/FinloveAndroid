@@ -137,9 +137,9 @@ class HomeFragment : Fragment() {
         builder.create().show()
     }
 
-    // ส่งข้อมูลรายงานผู้ใช้ไปยัง API
+    // ส่งข้อมูลรายงานผู้ใช้ไปยัง api_v2
     private fun reportUser(reportedID: Int, reportType: String) {
-        val url = getString(R.string.root_url) + "/api/report"
+        val url = getString(R.string.root_url) + "/api_v2/report"
         val formBody = FormBody.Builder()
             .add("reporterID", userID.toString())
             .add("reportedID", reportedID.toString())
@@ -176,7 +176,7 @@ class HomeFragment : Fragment() {
 
     // ฟังก์ชันสำหรับการกด "Like"
     private fun likeUser(likedID: Int) {
-        val url = getString(R.string.root_url) + "/api/like"
+        val url = getString(R.string.root_url) + "/api_v2/like"
         val formBody = FormBody.Builder()
             .add("likerID", userID.toString())
             .add("likedID", likedID.toString())
@@ -203,7 +203,7 @@ class HomeFragment : Fragment() {
 
     // ฟังก์ชันตรวจสอบการ Match
     private fun checkMatch(likedID: Int) {
-        val url = getString(R.string.root_url) + "/api/check_match"
+        val url = getString(R.string.root_url) + "/api_v2/check_match"
         val formBody = FormBody.Builder()
             .add("userID", userID.toString())
             .add("likedID", likedID.toString())
@@ -247,7 +247,7 @@ class HomeFragment : Fragment() {
 
     // ฟังก์ชันสำหรับการกด "Dislike"
     private fun dislikeUser(dislikedID: Int) {
-        val url = getString(R.string.root_url) + "/api/dislike"
+        val url = getString(R.string.root_url) + "/api_v2/dislike"
         val formBody = FormBody.Builder()
             .add("dislikerID", userID.toString())
             .add("dislikedID", dislikedID.toString())
@@ -275,7 +275,7 @@ class HomeFragment : Fragment() {
     // ดึงข้อมูลผู้ใช้ที่แนะนำ
     private fun fetchRecommendedUsers(callback: (List<User>) -> Unit) {
         lifecycleScope.launch(Dispatchers.IO) {
-            val url = getString(R.string.root_url2) + "/ai/recommend/$userID"
+            val url = getString(R.string.root_url2) + "/ai_v2/recommend/$userID"
             val request = Request.Builder().url(url).build()
 
             try {

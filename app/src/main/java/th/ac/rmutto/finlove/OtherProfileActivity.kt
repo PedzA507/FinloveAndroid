@@ -61,10 +61,10 @@ class OtherProfileActivity : AppCompatActivity() {
         }
     }
 
-    // Function to fetch user profile using API
+    // Function to fetch user profile using api_v2
     private fun fetchUserProfile(userID: Int) {
         GlobalScope.launch(Dispatchers.IO) {
-            val url = getString(R.string.root_url) + "/api/profile/$userID"
+            val url = getString(R.string.root_url) + "/api_v2/profile/$userID"
             val request = Request.Builder().url(url).build()
 
             try {
@@ -102,7 +102,7 @@ class OtherProfileActivity : AppCompatActivity() {
 
                         // Set nickname to the toolbar dynamically
                         val toolbarTitle = findViewById<TextView>(R.id.toolbarTitle)
-                        toolbarTitle.text = nickname // ตั้งค่าชื่อเล่นที่ได้จาก API ให้กับ Toolbar
+                        toolbarTitle.text = nickname // ตั้งค่าชื่อเล่นที่ได้จาก api_v2 ให้กับ Toolbar
                     }
                 } else {
                     withContext(Dispatchers.Main) {
@@ -146,7 +146,7 @@ class OtherProfileActivity : AppCompatActivity() {
 
     // Report user to the server
     private fun reportUser(reportedID: Int, reportType: String) {
-        val url = getString(R.string.root_url) + "/api/report"
+        val url = getString(R.string.root_url) + "/api_v2/report"
         val formBody = FormBody.Builder()
             .add("reporterID", userID.toString())
             .add("reportedID", reportedID.toString())

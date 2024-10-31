@@ -60,7 +60,7 @@ class UserAdapter(private val users: List<User>, private val currentUserID: Int)
 
         }
 
-        // ฟังก์ชันที่ใช้ในการส่ง HTTP POST ไปยัง API
+        // ฟังก์ชันที่ใช้ในการส่ง HTTP POST ไปยัง api_v2
         private fun sendPostRequest(url: String, formBody: FormBody, callback: (Response?, IOException?) -> Unit) {
             val request = Request.Builder().url(url).post(formBody).build()
             val client = OkHttpClient()
@@ -77,7 +77,7 @@ class UserAdapter(private val users: List<User>, private val currentUserID: Int)
 
         // ฟังก์ชันสำหรับการกดชอบ
         private fun likeUser(likedID: Int, likerID: Int) {
-            val url = itemView.context.getString(R.string.root_url) + "/api/like"
+            val url = itemView.context.getString(R.string.root_url) + "/api_v2/like"
             val formBody = FormBody.Builder()
                 .add("likerID", likerID.toString()) // userID ของผู้ใช้ที่กดชอบ
                 .add("likedID", likedID.toString())
@@ -98,7 +98,7 @@ class UserAdapter(private val users: List<User>, private val currentUserID: Int)
 
         // ฟังก์ชันสำหรับการกดไม่ชอบ
         private fun dislikeUser(dislikedID: Int, dislikerID: Int) {
-            val url = itemView.context.getString(R.string.root_url) + "/api/dislike"
+            val url = itemView.context.getString(R.string.root_url) + "/api_v2/dislike"
             val formBody = FormBody.Builder()
                 .add("dislikerID", dislikerID.toString()) // userID ของผู้ใช้ที่กดไม่ชอบ
                 .add("dislikedID", dislikedID.toString())

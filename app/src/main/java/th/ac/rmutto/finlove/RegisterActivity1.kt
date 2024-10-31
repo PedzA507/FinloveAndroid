@@ -12,6 +12,7 @@ import android.content.Intent
 import android.text.InputFilter
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody
+import android.util.Log
 
 class RegisterActivity1 : AppCompatActivity() {
 
@@ -27,16 +28,15 @@ class RegisterActivity1 : AppCompatActivity() {
         val buttonNext = findViewById<ImageButton>(R.id.buttonNext)
 
         // กำหนดข้อจำกัดจำนวนตัวอักษรตามฐานข้อมูล
-        editTextUsername.filters = arrayOf(InputFilter.LengthFilter(20)) // จำกัดชื่อผู้ใช้ไม่เกิน 20 ตัวอักษร
-        editTextEmail.filters = arrayOf(InputFilter.LengthFilter(30)) // จำกัดอีเมลไม่เกิน 40 ตัวอักษร
-        editTextPassword.filters = arrayOf(InputFilter.LengthFilter(20)) // จำกัดรหัสผ่านไม่เกิน 20 ตัวอักษร
+        editTextUsername.filters = arrayOf(InputFilter.LengthFilter(20))
+        editTextEmail.filters = arrayOf(InputFilter.LengthFilter(30))
+        editTextPassword.filters = arrayOf(InputFilter.LengthFilter(20))
 
         buttonNext.setOnClickListener {
             val email = editTextEmail.text.toString()
             val username = editTextUsername.text.toString()
             val password = editTextPassword.text.toString()
 
-            // ตรวจสอบความยาวของข้อมูลอีกครั้งในกรณีที่มีการ bypass input filter
             if (email.length > 40) {
                 editTextEmail.error = "อีเมลต้องไม่เกิน 40 ตัวอักษร"
                 return@setOnClickListener
@@ -67,17 +67,17 @@ class RegisterActivity1 : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            // Check if the username and email are available
+            // Log ข้อมูลก่อนเรียก API
+            Log.d("RegisterActivity1", "Calling checkUsernameEmail with username: $username, email: $email")
+
             checkUsernameEmail(username, email) { isAvailable, message ->
                 if (isAvailable) {
-                    // Both username and email are available, proceed to next screen
                     val intent = Intent(this@RegisterActivity1, RegisterActivity2::class.java)
                     intent.putExtra("email", email)
                     intent.putExtra("username", username)
                     intent.putExtra("password", password)
                     startActivity(intent)
                 } else {
-                    // Show the error message received from the server
                     Toast.makeText(this@RegisterActivity1, message, Toast.LENGTH_LONG).show()
                 }
             }
@@ -93,14 +93,17 @@ class RegisterActivity1 : AppCompatActivity() {
         val mediaType = "application/json; charset=utf-8".toMediaTypeOrNull()
         val requestBody = jsonObject.toString().toRequestBody(mediaType)
 
-        val url = getString(R.string.root_url) + "/api/checkUsernameEmail"
+        val url = getString(R.string.root_url) + "/api_v2/checkUsernameEmail"
         val request = Request.Builder()
             .url(url)
             .post(requestBody)
             .build()
 
+        Log.d("RegisterActivity1", "Sending request to URL: $url with body: $jsonObject")
+
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
+                Log.e("RegisterActivity1", "API call failed: ${e.message}")
                 runOnUiThread {
                     Toast.makeText(this@RegisterActivity1, "เกิดข้อผิดพลาดในระบบ", Toast.LENGTH_SHORT).show()
                 }
@@ -109,12 +112,38 @@ class RegisterActivity1 : AppCompatActivity() {
 
             override fun onResponse(call: Call, response: Response) {
                 val responseBody = response.body?.string()
-                val jsonResponse = JSONObject(responseBody ?: "{}")
-                val isAvailable = jsonResponse.optBoolean("status", false)
-                val message = jsonResponse.optString("message", "เกิดข้อผิดพลาด")
+                Log.d("RegisterActivity1", "Response received with code: ${response.code}")
 
                 runOnUiThread {
-                    callback(isAvailable, message)
+                    try {
+                        if (!response.isSuccessful) {
+                            Log.e("RegisterActivity1", "Server error: ${response.code}")
+                            Toast.makeText(this@RegisterActivity1, "ข้อผิดพลาดจากเซิร์ฟเวอร์: ${response.code}", Toast.LENGTH_SHORT).show()
+                            callback(false, "ข้อผิดพลาดจากเซิร์ฟเวอร์: ${response.code}")
+                            return@runOnUiThread
+                        }
+
+                        if (responseBody.isNullOrEmpty()) {
+                            Log.e("RegisterActivity1", "Empty response from server")
+                            Toast.makeText(this@RegisterActivity1, "ไม่ได้รับข้อมูลจากเซิร์ฟเวอร์", Toast.LENGTH_SHORT).show()
+                            callback(false, "ไม่ได้รับข้อมูลจากเซิร์ฟเวอร์")
+                            return@runOnUiThread
+                        }
+
+                        Log.d("RegisterActivity1", "Response body: $responseBody")
+
+                        val jsonResponse = JSONObject(responseBody)
+                        val isAvailable = jsonResponse.optBoolean("status", false)
+                        val message = jsonResponse.optString("message", "เกิดข้อผิดพลาด")
+
+                        Log.d("RegisterActivity1", "Parsed JSON - isAvailable: $isAvailable, message: $message")
+
+                        callback(isAvailable, message)
+                    } catch (e: Exception) {
+                        Log.e("RegisterActivity1", "Error parsing JSON response: ${e.message}")
+                        Toast.makeText(this@RegisterActivity1, "เกิดข้อผิดพลาดในการแปลงข้อมูล", Toast.LENGTH_SHORT).show()
+                        callback(false, "เกิดข้อผิดพลาดในการแปลงข้อมูล")
+                    }
                 }
             }
         })

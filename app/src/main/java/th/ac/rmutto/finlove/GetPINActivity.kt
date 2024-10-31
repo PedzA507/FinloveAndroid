@@ -57,7 +57,7 @@ class GetPINActivity : AppCompatActivity() {
             .add("pin", pin)
             .build()
         val rootUrl = getString(R.string.root_url) // ดึงค่า root_url จาก strings.xml
-        val url = "$rootUrl/api/verify-pin" // ประกอบ URL กับ path ที่ต้องการ
+        val url = "$rootUrl/api_v2/verify-pin" // ประกอบ URL กับ path ที่ต้องการ
         val request = Request.Builder()
             .url(url)  // URL สำหรับ verify PIN
             .post(requestBody)

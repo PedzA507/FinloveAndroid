@@ -106,7 +106,7 @@ class ChatActivity : AppCompatActivity() {
         }
 
         lifecycleScope.launch(Dispatchers.IO) {
-            val url = getString(R.string.root_url) + "/api/block-chat"
+            val url = getString(R.string.root_url) + "/api_v2/block-chat"
             val requestBody = FormBody.Builder()
                 .add("userID", senderID.toString())
                 .add("matchID", matchID.toString())
@@ -138,7 +138,7 @@ class ChatActivity : AppCompatActivity() {
 
     private fun unblockChat() {
         lifecycleScope.launch(Dispatchers.IO) {
-            val url = getString(R.string.root_url) + "/api/unblock-chat"
+            val url = getString(R.string.root_url) + "/api_v2/unblock-chat"
             val requestBody = FormBody.Builder()
                 .add("userID", senderID.toString())
                 .add("matchID", matchID.toString())
@@ -169,7 +169,7 @@ class ChatActivity : AppCompatActivity() {
 
     private fun fetchChatMessages() {
         lifecycleScope.launch(Dispatchers.IO) {
-            val url = getString(R.string.root_url) + "/api/chats/$matchID"
+            val url = getString(R.string.root_url) + "/api_v2/chats/$matchID"
             val request = Request.Builder().url(url).build()
 
             try {
@@ -208,7 +208,7 @@ class ChatActivity : AppCompatActivity() {
         }
 
         lifecycleScope.launch(Dispatchers.IO) {
-            val url = getString(R.string.root_url) + "/api/chats/$matchID"
+            val url = getString(R.string.root_url) + "/api_v2/chats/$matchID"
             val requestBody = FormBody.Builder()
                 .add("senderID", senderID.toString())
                 .add("message", message)

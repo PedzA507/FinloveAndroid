@@ -67,18 +67,18 @@ class ResetPasswordActivity : AppCompatActivity() {
         progressBar.visibility = View.VISIBLE
         resetButton.isEnabled = false
 
-        // สร้าง JSON object สำหรับส่งไปยัง API
+        // สร้าง JSON object สำหรับส่งไปยัง api_v2
         val json = JSONObject()
         json.put("email", email)
         json.put("pin", pin)  // ส่ง PIN ที่ได้รับจากหน้าอื่น
         json.put("newPassword", newPassword)
 
-        Log.d("ResetPassword", "Request JSON: $json") // Log ข้อมูล JSON ที่จะส่งไปยัง API
+        Log.d("ResetPassword", "Request JSON: $json") // Log ข้อมูล JSON ที่จะส่งไปยัง api_v2
 
         val requestBody = json.toString().toRequestBody("application/json; charset=utf-8".toMediaType())
 
         val rootUrl = getString(R.string.root_url) // ดึงค่า root_url จาก strings.xml
-        val url = "$rootUrl/api/reset-password"
+        val url = "$rootUrl/api_v2/reset-password"
 
         val request = Request.Builder()
             .url(url)

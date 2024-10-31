@@ -258,7 +258,7 @@ class ProfileFragment : Fragment() {
     private fun fetchUserInfo(userID: Int) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                val url = getString(R.string.root_url) + "/api/user/$userID"
+                val url = getString(R.string.root_url) + "/api_v2/user/$userID"
                 val request = Request.Builder().url(url).build()
                 val response = OkHttpClient().newCall(request).execute()
 
@@ -380,7 +380,7 @@ class ProfileFragment : Fragment() {
 
                 val requestBody = requestBuilder.build()
                 val rootUrl = getString(R.string.root_url)
-                val url = "$rootUrl/api/user/update/$userID"
+                val url = "$rootUrl/api_v2/user/update/$userID"
                 val request = Request.Builder().url(url).put(requestBody).build()
 
                 val response = client.newCall(request).execute()
@@ -492,7 +492,7 @@ class ProfileFragment : Fragment() {
             try {
                 val client = OkHttpClient()
                 val request = Request.Builder()
-                    .url("${getString(R.string.root_url)}/api/user/$userID")
+                    .url("${getString(R.string.root_url)}/api_v2/user/$userID")
                     .delete()
                     .build()
 
@@ -520,7 +520,7 @@ class ProfileFragment : Fragment() {
     private fun logoutUser(userID: Int) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                val url = getString(R.string.root_url) + "/api/logout/$userID"
+                val url = getString(R.string.root_url) + "/api_v2/logout/$userID"
                 val request = Request.Builder()
                     .url(url)
                     .post(okhttp3.FormBody.Builder().build())

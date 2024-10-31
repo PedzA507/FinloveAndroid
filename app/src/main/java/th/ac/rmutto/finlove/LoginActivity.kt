@@ -41,7 +41,7 @@ class LoginActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            val url = getString(R.string.root_url) + "/api/login"
+            val url = getString(R.string.root_url) + "/api_v2/login"
             val formBody: RequestBody = FormBody.Builder()
                 .add("username", username)
                 .add("password", password)
