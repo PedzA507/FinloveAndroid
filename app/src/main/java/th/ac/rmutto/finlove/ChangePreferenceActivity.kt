@@ -81,7 +81,7 @@ class ChangePreferenceActivity : AppCompatActivity() {
 
             Log.d("ChangePreferenceActivity", "UserID: $userID")
 
-            val url = getString(R.string.root_url) + "/api/user/update_preferences/$userID"
+            val url = getString(R.string.root_url) + "/api_v2/user/update_preferences/$userID"
             Log.d("ChangePreferenceActivity", "API URL: $url")
 
             val formBody: RequestBody = FormBody.Builder()
