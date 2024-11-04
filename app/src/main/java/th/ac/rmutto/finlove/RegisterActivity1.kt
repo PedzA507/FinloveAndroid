@@ -93,7 +93,7 @@ class RegisterActivity1 : AppCompatActivity() {
         val mediaType = "application/json; charset=utf-8".toMediaTypeOrNull()
         val requestBody = jsonObject.toString().toRequestBody(mediaType)
 
-        val url = getString(R.string.root_url) + "/api_v2/checkUsernameEmail"
+        val url = getString(R.string.root_url) + "/api_v2/checkusernameEmail"
         val request = Request.Builder()
             .url(url)
             .post(requestBody)
