@@ -210,21 +210,24 @@ class MessageFragment : Fragment() {
             }
         }
     }
-
     private fun parseUsers(responseBody: String?): List<MatchedUser> {
         val users = mutableListOf<MatchedUser>()
         responseBody?.let {
             val jsonArray = JSONArray(it)
             for (i in 0 until jsonArray.length()) {
                 val jsonObject = jsonArray.getJSONObject(i)
+
+                // ดึง imageFile โดยตรงจาก JSON ไม่ต้องเพิ่ม URL ซ้ำ
+                val imageUrl = jsonObject.optString("imageFile", "")
+
                 val user = MatchedUser(
-                    jsonObject.getInt("userID"),
-                    jsonObject.getString("nickname"),
-                    jsonObject.getString("imageFile"),
-                    jsonObject.optString("lastMessage"),
-                    jsonObject.getInt("matchID"),
-                    jsonObject.optString("lastInteraction"),
-                    jsonObject.optBoolean("isBlocked")
+                    userID = jsonObject.getInt("userID"),
+                    nickname = jsonObject.getString("nickname"),
+                    profilePicture = imageUrl, // ใช้ URL ที่ตรงจาก JSON
+                    lastMessage = jsonObject.optString("lastMessage"),
+                    matchID = jsonObject.getInt("matchID"),
+                    lastInteraction = jsonObject.optString("lastInteraction"),
+                    isBlocked = jsonObject.optBoolean("isBlocked")
                 )
                 users.add(user)
             }
@@ -264,13 +267,18 @@ class MatchedUserAdapter(
         holder.nickname.text = user.nickname
         holder.lastMessage.text = user.lastMessage ?: "ไม่มีข้อความล่าสุด"
         holder.lastInteraction.text = formatTime(user.lastInteraction)
-        Glide.with(holder.profileImage.context).load(user.profilePicture).into(holder.profileImage)
+
+        // โหลดภาพด้วย Glide โดยมี placeholder และ error image
+        Glide.with(holder.profileImage.context)
+            .load(user.profilePicture)
+            .placeholder(R.drawable.img_1) // ภาพที่แสดงระหว่างโหลด
+            .error(R.drawable.error) // ภาพที่แสดงถ้าโหลดไม่สำเร็จ
+            .into(holder.profileImage)
 
         holder.itemView.setOnClickListener { onChatClick(user) }
         holder.profileImage.setOnClickListener { onProfileClick(user) }
 
         holder.buttonDeleteChat.setOnClickListener {
-            // Show confirmation dialog
             AlertDialog.Builder(holder.itemView.context)
                 .setTitle("ยืนยันการลบแชท")
                 .setMessage("คุณแน่ใจหรือไม่ว่าต้องการลบแชทนี้? การลบจะทำให้แชทไม่แสดงผล")
@@ -284,6 +292,7 @@ class MatchedUserAdapter(
                 .show()
         }
     }
+
 
     override fun getItemCount() = users.size
 

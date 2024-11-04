@@ -52,6 +52,9 @@ class ProfileFragment : Fragment() {
     private lateinit var preferenceContainer: LinearLayout
     private lateinit var verifyBadge: ImageView
 
+    private lateinit var user: User // ประกาศตัวแปร user ที่คลาส level
+
+
     private lateinit var buttonEditProfile: ImageButton
     private lateinit var buttonSaveProfile: Button
     private lateinit var buttonEditPreferences: Button
@@ -225,10 +228,11 @@ class ProfileFragment : Fragment() {
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == AppCompatActivity.RESULT_OK && data != null && data.data != null) {
             selectedImageUri = data.data
             Glide.with(this)
-                .load(selectedImageUri)
+                .load(user.imageFile) // URL ควรมาจาก server
                 .placeholder(R.drawable.img_1)
                 .error(R.drawable.error)
                 .into(imageViewProfile)
+
         } else if (requestCode == REQUEST_CODE_CHANGE_PREFERENCES && resultCode == AppCompatActivity.RESULT_OK && data != null) {
             val updatedPreferences = data.getStringExtra("preferences")
             loadPreferences(updatedPreferences)
@@ -264,7 +268,7 @@ class ProfileFragment : Fragment() {
 
                 if (response.isSuccessful) {
                     val responseBody = response.body?.string()
-                    val user = parseUserInfo(responseBody)
+                    user = parseUserInfo(responseBody) // กำหนดค่าให้ user ที่นี่
 
                     withContext(Dispatchers.Main) {
                         originalUser = user

@@ -19,12 +19,6 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
-            android:name=".TermsActivity"
-            android:exported="false" />
-        <activity
-            android:name=".yourfaceActivity"
-            android:exported="false" />
-        <activity
             android:name=".AddphotoActivity"
             android:exported="false" />
         <activity
@@ -56,9 +50,6 @@
             android:exported="false" />
         <activity
             android:name=".User"
-            android:exported="false" />
-        <activity
-            android:name=".ProfileActivity"
             android:exported="false" />
         <activity
             android:name=".RegisterActivity8"

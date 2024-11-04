@@ -1,6 +1,7 @@
 package th.ac.rmutto.finlove
 
 import android.app.AlertDialog
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.util.Log
 import android.view.Gravity
@@ -8,6 +9,8 @@ import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -27,7 +30,7 @@ class OtherProfileActivity : AppCompatActivity() {
     private lateinit var genderTextView: TextView
     private lateinit var preferencesContainer: LinearLayout
     private lateinit var reportButton: Button
-    private lateinit var verifiedIcon: ImageView // เพิ่มการประกาศตัวแปร verifiedIcon
+    private lateinit var verifiedIcon: ImageView
     private val client = OkHttpClient()
     private var userID: Int = -1
 
@@ -43,7 +46,7 @@ class OtherProfileActivity : AppCompatActivity() {
         genderTextView = findViewById(R.id.textViewGender)
         preferencesContainer = findViewById(R.id.preferenceContainer)
         reportButton = findViewById(R.id.buttonReportUser)
-        verifiedIcon = findViewById(R.id.verifiedIcon) // เชื่อมโยง verifiedIcon
+        verifiedIcon = findViewById(R.id.verifiedIcon)
 
         // Get the userID from intent
         userID = intent.getIntExtra("userID", -1)
@@ -79,8 +82,16 @@ class OtherProfileActivity : AppCompatActivity() {
                     val nickname = jsonObject.optString("nickname")
                     val gender = jsonObject.optString("gender")
                     val preferences = jsonObject.optString("preferences")
-                    val profileImage = jsonObject.optString("imageFile")
-                    val isVerified = jsonObject.optInt("verify", 0) == 1 // Check if user is verified
+                    var profileImage = jsonObject.optString("imageFile")
+                    val isVerified = jsonObject.optInt("verify", 0) == 1
+
+                    // เติม URL แบบเต็มถ้า profileImage ไม่ได้เป็น URL แบบเต็ม
+                    if (!profileImage.startsWith("http")) {
+                        profileImage = getString(R.string.root_url) + "/api_v2/user/image/" + profileImage
+                    }
+
+                    // Log the profileImage URL to ensure it's correct
+                    Log.d("OtherProfileActivity", "Profile Image URL: $profileImage")
 
                     // Update UI on the main thread
                     withContext(Dispatchers.Main) {
@@ -92,6 +103,30 @@ class OtherProfileActivity : AppCompatActivity() {
                         // Load profile image using Glide
                         Glide.with(this@OtherProfileActivity)
                             .load(profileImage)
+                            .placeholder(R.drawable.img_1)  // แสดงภาพ placeholder ขณะกำลังโหลด
+                            .error(R.drawable.error)        // แสดงภาพ error ถ้าโหลดไม่ได้
+                            .listener(object : RequestListener<Drawable> {
+                                override fun onLoadFailed(
+                                    e: com.bumptech.glide.load.engine.GlideException?,
+                                    model: Any?,
+                                    target: Target<Drawable>?,
+                                    isFirstResource: Boolean
+                                ): Boolean {
+                                    Log.e("GlideError", "Error loading image", e)
+                                    return false
+                                }
+
+                                override fun onResourceReady(
+                                    resource: Drawable?,
+                                    model: Any?,
+                                    target: Target<Drawable>?,
+                                    dataSource: com.bumptech.glide.load.DataSource?,
+                                    isFirstResource: Boolean
+                                ): Boolean {
+                                    Log.d("GlideSuccess", "Image loaded successfully")
+                                    return false
+                                }
+                            })
                             .into(profileImageView)
 
                         // Show verified icon if user is verified
@@ -102,7 +137,7 @@ class OtherProfileActivity : AppCompatActivity() {
 
                         // Set nickname to the toolbar dynamically
                         val toolbarTitle = findViewById<TextView>(R.id.toolbarTitle)
-                        toolbarTitle.text = nickname // ตั้งค่าชื่อเล่นที่ได้จาก api_v2 ให้กับ Toolbar
+                        toolbarTitle.text = nickname
                     }
                 } else {
                     withContext(Dispatchers.Main) {
@@ -117,7 +152,6 @@ class OtherProfileActivity : AppCompatActivity() {
             }
         }
     }
-
 
     // Show the report dialog
     private fun showReportDialog(reportedID: Int) {
@@ -180,19 +214,17 @@ class OtherProfileActivity : AppCompatActivity() {
             val preferenceTextView = TextView(this)
             preferenceTextView.text = preference
             preferenceTextView.setBackgroundResource(R.drawable.show_preference)
-            preferenceTextView.setPadding(16, 16, 16, 16)  // ตามดีไซน์ที่จำไว้
+            preferenceTextView.setPadding(16, 16, 16, 16)
             preferenceTextView.textSize = 14f
-            preferenceTextView.setTypeface(null, android.graphics.Typeface.BOLD) // ทำตัวหนังสือหนา
-            preferenceTextView.gravity = Gravity.CENTER // จัดให้ตัวหนังสืออยู่ตรงกลาง
+            preferenceTextView.setTypeface(null, android.graphics.Typeface.BOLD)
+            preferenceTextView.gravity = Gravity.CENTER
             preferenceTextView.setTextColor(resources.getColor(R.color.white))
 
-            // กำหนด layoutParams ตามดีไซน์ที่จำไว้
             val layoutParams = LinearLayout.LayoutParams(250, 150)
-            layoutParams.setMargins(16, 16, 16, 16) // เพิ่มมาร์จินตามดีไซน์
+            layoutParams.setMargins(16, 16, 16, 16)
             preferenceTextView.layoutParams = layoutParams
 
             preferencesContainer.addView(preferenceTextView)
         }
     }
-
 }
